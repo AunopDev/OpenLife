@@ -1,0 +1,281 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #04050e;
+  overflow: hidden;
+  font-family: "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif;
+  color: #eaf0ff;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+#stage {
+  position: absolute;
+  left: 0; top: 0;
+  width: 1440px; height: 900px;
+  transform-origin: top left;
+  overflow: hidden;
+  background: #0a0f2b;
+}
+
+#game { position: absolute; inset: 0; display: block; }
+
+/* ---------- shared panel ---------- */
+.panel {
+  background: linear-gradient(180deg, rgba(24, 31, 82, .95), rgba(15, 20, 52, .95));
+  border: 2px solid #c9d6ff;
+  border-radius: 12px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .5), inset 0 0 0 2px rgba(44, 60, 150, .5);
+}
+
+/* ---------- character mini card ---------- */
+.char-mini {
+  position: absolute;
+  left: 22px; top: 18px;
+  width: 322px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+}
+
+#portrait {
+  width: 52px; height: 52px;
+  image-rendering: pixelated;
+  border: 2px solid #c9d6ff;
+  border-radius: 8px;
+  background: #161d55;
+  flex: none;
+}
+
+.cm-name {
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.15;
+}
+.cm-role {
+  font-size: 11.5px;
+  color: #ffd75e;
+  margin-top: 3px;
+}
+
+/* ---------- stat panel ---------- */
+.stat-panel {
+  position: absolute;
+  left: 22px; top: 90px;
+  width: 322px;
+  padding: 9px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row { display: flex; align-items: center; gap: 8px; }
+.stat-ico {
+  width: 18px; height: 18px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: #a9b8f2;
+}
+.stat-ico svg { width: 16px; height: 16px; }
+.stat-lbl { font-size: 12px; color: #b9c6f5; width: 62px; flex: none; }
+.stat-val {
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  width: 56px;
+  text-align: right;
+  flex: none;
+}
+.stat-bar {
+  flex: 1;
+  height: 7px;
+  border-radius: 4px;
+  background: #070b24;
+  overflow: hidden;
+  border: 1px solid #0a0e2a;
+}
+.stat-bar i { display: block; height: 100%; border-radius: 4px; transition: width .25s linear; }
+
+/* ---------- clock ---------- */
+.clock-panel {
+  position: absolute;
+  right: 22px; top: 18px;
+  width: 208px;
+  padding: 8px 14px 10px;
+  text-align: right;
+}
+.clk {
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+.clk-date { font-size: 12px; color: #c9d4ff; margin-top: 4px; }
+.dayprog {
+  height: 5px;
+  background: #070b24;
+  border-radius: 3px;
+  margin-top: 7px;
+  overflow: hidden;
+}
+.dayprog i {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, #ffd75e, #ff9f4a);
+}
+
+/* ---------- minimap ---------- */
+.mini-panel {
+  position: absolute;
+  right: 22px; bottom: 20px;
+  padding: 8px;
+}
+#mini { display: block; width: 190px; height: 133px; border-radius: 6px; }
+.mini-cap { text-align: center; font-size: 11px; color: #a9b8f2; margin-top: 5px; }
+
+/* ---------- hint ---------- */
+.hint {
+  position: absolute;
+  left: 22px; bottom: 20px;
+  font-size: 12px;
+  color: #9fb0f0;
+  background: rgba(10, 14, 40, .8);
+  border: 1px solid rgba(160, 180, 240, .35);
+  border-radius: 8px;
+  padding: 6px 12px;
+}
+.hint b { color: #ffd75e; font-family: "Chakra Petch", sans-serif; }
+
+/* ---------- interaction prompt ---------- */
+.prompt {
+  position: absolute;
+  left: 50%; bottom: 46px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 10px;
+  background: rgba(10, 14, 40, .93);
+  border: 2px solid #c9d6ff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .55);
+  font-size: 14px;
+  animation: floaty 1.6s ease-in-out infinite;
+}
+.prompt.hidden { display: none; }
+.prompt .key {
+  display: grid; place-items: center;
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: #ffd75e;
+  color: #231a00;
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 2px 0 #b08a18;
+}
+@keyframes floaty {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
+}
+
+/* ---------- toast ---------- */
+#toast {
+  position: absolute;
+  left: 50%; top: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 70;
+  pointer-events: none;
+}
+.toast-item {
+  background: rgba(10, 14, 40, .96);
+  border: 1px solid #c9d6ff;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .55);
+  animation: pop .2s ease;
+}
+@keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ---------- modal ---------- */
+.overlay {
+  position: absolute; inset: 0;
+  background: rgba(4, 6, 20, .7);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  padding: 40px;
+}
+.overlay.hidden { display: none; }
+
+.modal {
+  width: 700px;
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: pop .18s ease;
+}
+
+.ev-head { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #9fb0f0; }
+.ev-chip {
+  background: #28379a;
+  border: 1px solid #c9d6ff;
+  color: #eaf0ff;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+}
+.ev-title {
+  font-family: "Chakra Petch", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.ev-text { font-size: 15px; line-height: 1.7; color: #dce4ff; }
+
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choice {
+  text-align: left;
+  padding: 10px 13px;
+  border-radius: 10px;
+  border: 2px solid #4658b8;
+  background: rgba(12, 17, 48, .92);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: .12s;
+  color: #eaf0ff;
+  font-family: inherit;
+}
+.choice:hover:not(:disabled) { border-color: #ffd75e; transform: translateX(3px); }
+.choice:focus { outline: none; }
+.c-label { font-size: 14px; font-weight: 600; }
+.c-hint { font-size: 11.5px; color: #9fb0f0; display: flex; gap: 8px; flex-wrap: wrap; }
+.hint.up { color: #6ee7a8; }
+.hint.down { color: #ff8fb1; }
+.hint.req { color: #ffd75e; }
+.hint.time { color: #7dd3fc; }
+
+.work-preview {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #b9c6f5;
+  background: rgba(8, 11, 34, .5);
+  border: 1px solid rgba(120, 140, 230, .3);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.work-preview b { color: #ffd75e; font-family: "Chakra Petch", sans-serif; }

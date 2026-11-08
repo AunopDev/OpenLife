@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OpenLife — Walkable Prototype v0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="stage">
+  <canvas id="game" width="1440" height="900"></canvas>
+
+  <div class="panel char-mini">
+    <canvas id="portrait" width="24" height="24"></canvas>
+    <div class="cm-info">
+      <div class="cm-name">สมชาย ใจดี</div>
+      <div class="cm-role">พนักงานเงินเดือน · เด็กใหม่</div>
+    </div>
+  </div>
+
+  <div class="panel stat-panel" id="statPanel"></div>
+
+  <div class="panel clock-panel">
+    <div class="clk" id="clockTime">07:30</div>
+    <div class="clk-date" id="clockDate">จ. 1 ม.ค. 2569</div>
+    <div class="dayprog"><i id="dayProg"></i></div>
+  </div>
+
+  <div class="panel mini-panel">
+    <canvas id="mini" width="200" height="140"></canvas>
+    <div class="mini-cap" id="locName">บางรัก · กรุงเทพฯ</div>
+  </div>
+
+  <div class="hint"><b>WASD</b> เดิน · <b>E</b> ใช้งาน</div>
+
+  <div class="prompt hidden" id="prompt">
+    <span class="key">E</span><span id="promptText"></span>
+  </div>
+
+  <div id="toast"></div>
+
+  <div class="overlay hidden" id="overlay">
+    <div class="panel modal" id="modal"></div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

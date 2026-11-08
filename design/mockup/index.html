@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OpenLife — UI Mockup v0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="stage">
+  <canvas id="map" width="480" height="300"></canvas>
+  <div id="labels"></div>
+  <div id="vignette"></div>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="panel char-card">
+      <canvas id="portrait" width="24" height="24"></canvas>
+      <div class="char-info">
+        <div class="char-name">สมชาย ใจดี</div>
+        <div class="badge">พนักงานเงินเดือน · เด็กใหม่</div>
+      </div>
+      <div class="clock">
+        <div class="time">19:08</div>
+        <div class="date" id="dateText">1 ม.ค. 2569</div>
+        <div class="payday">เงินเดือนออกอีก 6 วัน</div>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat">
+        <div class="row"><span class="lbl">เงิน</span><b id="vMoney">4,500</b></div>
+        <div class="bar"><i id="bMoney" style="width:9%;background:linear-gradient(90deg,#FFD75E,#FF9F4A)"></i></div>
+      </div>
+      <div class="stat">
+        <div class="row"><span class="lbl">พลังงาน</span><b id="vEnergy">62</b></div>
+        <div class="bar"><i id="bEnergy" style="width:62%;background:linear-gradient(90deg,#6EE7A8,#3FBF87)"></i></div>
+      </div>
+      <div class="stat">
+        <div class="row"><span class="lbl">ใจ</span><b id="vHeart">41</b></div>
+        <div class="bar"><i id="bHeart" style="width:41%;background:linear-gradient(90deg,#FF8FB1,#E85C8C)"></i></div>
+      </div>
+      <div class="stat">
+        <div class="row"><span class="lbl">ผลงาน</span><b id="vKpi">54</b></div>
+        <div class="bar"><i id="bKpi" style="width:54%;background:linear-gradient(90deg,#7DD3FC,#4A9BE8)"></i></div>
+      </div>
+    </div>
+
+    <div class="panel ticker">
+      <div class="ticker-badge">ข่าวในออฟฟิศ</div>
+      <div class="ticker-view"><div class="ticker-text" id="tickerText">HR ประกาศปรับโครงสร้างองค์กร · โบนัสปีนี้ล่าช้า · หัวหน้าทีมลาออกกะทันหัน · ใครวางแก้วกาแฟไว้บนโต๊ะประชุมอีกแล้ว</div></div>
+    </div>
+  </div>
+
+  <!-- right rail -->
+  <div class="rail">
+    <div class="panel minimap">
+      <canvas id="mini" width="160" height="190"></canvas>
+      <div class="mini-caption">กรุงเทพฯ · ปริมณฑล</div>
+    </div>
+    <div class="icon-btn" title="โฟกัสตำแหน่ง">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+    </div>
+    <div class="icon-btn" title="ค้นหา">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
+    </div>
+    <div class="icon-btn" title="แผนที่">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>
+    </div>
+  </div>
+
+  <!-- planner -->
+  <div class="panel planner">
+    <div class="planner-head">
+      <div class="planner-title">แผนเดือนนี้ · <span id="monthText">ม.ค. 2569</span></div>
+      <div class="planner-hint">เลือก 3 กิจกรรม (ทุกอย่างมีราคา)</div>
+    </div>
+    <div class="slots" id="slots"></div>
+    <div class="planner-foot">
+      <div class="chips" id="chips"></div>
+      <button class="btn-primary" id="endMonth" disabled>จบเดือน ▶</button>
+    </div>
+  </div>
+
+  <div class="mock-tag">MOCKUP v0.1 · UI ทดสอบ ไม่ใช่เกมจริง</div>
+
+  <div class="overlay hidden" id="overlay">
+    <div class="panel modal" id="modal"></div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
