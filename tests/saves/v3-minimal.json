@@ -1,0 +1,28 @@
+{
+  "$comment": "เซฟ v3 รุ่นแรกสุด (มีแต่ field ยุคแรก) — ใช้ทดสอบว่าเซฟเก่ายังโหลดได้ ห้ามแก้ให้ทันสมัย; ถ้าเปลี่ยนโครงเซฟให้เพิ่มไฟล์ใหม่แทน",
+  "version": 3,
+  "savedAt": 0,
+  "stats": { "health": 70, "heart": 55, "energy": 60, "money": 8000, "kpi": 50, "credit": 62, "smarts": 55, "social": 50 },
+  "world": { "minutes": 600, "day": 3, "speed": 4.8 },
+  "flags": { "workedToday": false, "otEvent": false, "usedBus": false },
+  "profile": { "name": "เซฟเก่า", "age": 23, "chapter": "สร้างตัว", "job": "พนักงานเงินเดือน · เด็กใหม่" },
+  "finance": { "salary": 23000, "rent": 5500, "transport": 3000 },
+  "debts": { "credit": { "balance": 12000 } },
+  "career": { "rank": 0, "yearsInRank": 1, "lastReviewAge": 276, "reviews": 1, "promotions": 0, "bonusTotal": 0 },
+  "life": {
+    "phase": "adult",
+    "chapter": 5,
+    "turn": 12,
+    "ageMonths": 276,
+    "gender": "หญิง",
+    "province": "กรุงเทพฯ",
+    "district": "bangrak",
+    "traits": ["ประหยัด"],
+    "flags": {},
+    "careerTrack": "corporate"
+  },
+  "monthsPlayed": 12,
+  "player": { "x": 400, "y": 600, "dir": "down" },
+  "scene": "city",
+  "viewMode": "map"
+}

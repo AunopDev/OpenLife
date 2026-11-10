@@ -1,7 +1,8 @@
 /* OpenLife — start menu with animated pixel-art Bangkok skyline
    RESEARCH: docs/research/ui-main-menu.md
    หลักการ: Continue มาก่อนถ้ามีเซฟ, เริ่มเกมได้เร็ว, พื้นหลังเคลื่อนไหวแบบ parallax */
-import { isSoundEnabled, toggleSound, playSfx, unlockAudio } from './audio';
+import { isSoundEnabled, toggleSound, playSfx, unlockAudio } from '../audio/audio';
+import { escapeHtml } from '../core/util';
 
 export interface StartMenuOptions {
   hasSave: boolean;
@@ -615,14 +616,6 @@ export function openStartMenu(opts: StartMenuOptions): void {
 
   // preview one frame immediately so there is no flash
   if (ctx) drawFrame(ctx, 0);
-}
-
-function escapeHtml(s: string): string {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }
 
 export function closeStartMenu(): void {

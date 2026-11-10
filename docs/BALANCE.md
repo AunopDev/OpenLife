@@ -76,7 +76,7 @@
 
 ## วิธีรันซ้ำ
 
-ใช้ `scripts/balance-sim.js` (คัดลอกวางใน DevTools console หลังโหลดเกม) แล้วเรียก:
+ใช้ `scripts/balance-sim.js` (คัดลอกวางใน DevTools console หลังโหลดเกมด้วย `npm run dev` หรือ URL ที่มี `?debug=1` — debug hooks ปิดใน production) แล้วเรียก:
 
 ```js
 __sim(12)        // ทั้งชีวิต

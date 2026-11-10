@@ -6,21 +6,34 @@
     "region": "กลาง",
     "salary": 1,
     "rent": 1,
+    "map": { "palette": "bangkok", "region": "bangkok", "inlandWater": "canal", "roadLayout": "seeded" },
     "districts": [
       {
         "id": "bangrak",
         "name": "บางรัก",
         "vibe": "ริมน้ำ–ย่านธุรกิจเก่า",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "โรงแรมริมน้ำ", "roof": "#6e4a5a", "sign": "#ff8fb1" }
+        },
         "neighborhoods": [
           { "id": "silom", "name": "สีลม", "vibe": "ออฟฟิศ การเงิน สกายวอล์ก", "zone": "silom", "rent": 1.45, "salary": 1.18, "tags": ["office", "bts"] },
           { "id": "charoenkrung", "name": "เจริญกรุง", "vibe": "ตึกเก่า แกลเลอรี ริมน้ำ", "zone": "bangrak", "rent": 1.2, "salary": 1.05, "tags": ["heritage", "creative"] },
-          { "id": "suriyawong", "name": "สุริยวงศ์", "vibe": "ตลาดเก่า ชุมชนดั้งเดิม", "zone": "bangrak", "rent": 1.0, "salary": 0.96, "tags": ["local", "market"] }
+          { "id": "suriyawong", "name": "สุริยวงศ์", "vibe": "ตลาดเก่า ชุมชนดั้งเดิม", "zone": "bangrak", "rent": 1, "salary": 0.96, "tags": ["local", "market"] }
         ]
       },
       {
         "id": "pathumwan",
         "name": "ปทุมวัน",
         "vibe": "มหาวิทยาลัย–ศูนย์การค้า",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "ศูนย์การค้า", "roof": "#4a5a8a", "sign": "#7dd3fc" }
+        },
         "neighborhoods": [
           { "id": "samyan", "name": "สามย่าน", "vibe": "นักศึกษา หนังสือพิมพ์ ร้านหนังสือ", "zone": "samyan", "rent": 1.15, "salary": 1.05, "tags": ["student", "book"] },
           { "id": "chula", "name": "จุฬาฯ", "vibe": "มหาวิทยาลัย โรงพยาบาล หอสมุด", "zone": "chula", "rent": 1.25, "salary": 1.1, "tags": ["campus"] },
@@ -32,9 +45,16 @@
         "id": "samphanthawong",
         "name": "สัมพันธวงศ์",
         "vibe": "ไชนาทาวน์–ตลาดค้าส่ง",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "chinese",
+          "landmark": { "name": "ศาลเจ้าจีน", "roof": "#b8862f", "sign": "#ffd75e" },
+          "roof": "#8a3a32"
+        },
         "neighborhoods": [
-          { "id": "yaowarat", "name": "เยาวราช", "vibe": "ร้านทอง อาหารกลางคืน ศาลเจ้า", "zone": "yaowarat", "rent": 1.2, "salary": 1.0, "tags": ["market", "food", "gold"] },
-          { "id": "samphaeng", "name": "สำเพ็ง", "vibe": "ค้าส่ง ตรอกแคบ ผู้คนแน่น", "zone": "yaowarat", "rent": 1.0, "salary": 0.94, "tags": ["wholesale", "crowded"] },
+          { "id": "yaowarat", "name": "เยาวราช", "vibe": "ร้านทอง อาหารกลางคืน ศาลเจ้า", "zone": "yaowarat", "rent": 1.2, "salary": 1, "tags": ["market", "food", "gold"] },
+          { "id": "samphaeng", "name": "สำเพ็ง", "vibe": "ค้าส่ง ตรอกแคบ ผู้คนแน่น", "zone": "yaowarat", "rent": 1, "salary": 0.94, "tags": ["wholesale", "crowded"] },
           { "id": "talatnoi", "name": "ตลาดน้อย", "vibe": "ริมน้ำ คาเฟ่เก่า ช่างซ่อม", "zone": "yaowarat", "rent": 1.1, "salary": 1.03, "tags": ["riverside", "creative"] }
         ]
       },
@@ -42,16 +62,28 @@
         "id": "khlongtoei",
         "name": "คลองเตย",
         "vibe": "ท่าเรือ–ชุมชน–คอนโด",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "ท่าเรือคลองเตย", "roof": "#5a5f70", "sign": "#ff9f4a" }
+        },
         "neighborhoods": [
           { "id": "khlongtoei", "name": "คลองเตย", "vibe": "ท่าเรือ โรงงาน ชุมชนแน่น", "zone": "khlongtoei", "rent": 0.9, "salary": 0.95, "tags": ["port", "industrial"] },
           { "id": "khlongtan", "name": "คลองตัน", "vibe": "ตลาด ร้านอาหาร คอนโด", "zone": "khlongtoei", "rent": 1.12, "salary": 1.04, "tags": ["food", "condo"] },
-          { "id": "phrakhanong", "name": "พระโขนง", "vibe": "บ้านเก่า ซอยเงียบ รถติด", "zone": "khlongtoei", "rent": 1.05, "salary": 1.0, "tags": ["residential"] }
+          { "id": "phrakhanong", "name": "พระโขนง", "vibe": "บ้านเก่า ซอยเงียบ รถติด", "zone": "khlongtoei", "rent": 1.05, "salary": 1, "tags": ["residential"] }
         ]
       },
       {
         "id": "bangkhunthian",
         "name": "บางขุนเทียน",
         "vibe": "ทะเล คลอง ป่าชายเลน โรงงาน",
+        "map": {
+          "archetype": "town",
+          "coastal": true,
+          "wat": "thai",
+          "landmark": { "name": "ท่าเรือประมง", "roof": "#5a6a7a", "sign": "#7dd3fc" }
+        },
         "neighborhoods": [
           { "id": "thaikham", "name": "ท่าข้าม", "vibe": "ตลาดชุมชน คลองเล็ก", "zone": "", "rent": 0.7, "salary": 0.86, "tags": ["canal", "market"], "mapId": "bangkhunthian" },
           { "id": "samaedam", "name": "แสมดำ", "vibe": "ชายทะเล บ่อกุ้ง โรงงาน", "zone": "", "rent": 0.65, "salary": 0.82, "tags": ["coast", "industrial"], "mapId": "bangkhunthian" },
@@ -62,16 +94,30 @@
         "id": "sathorn",
         "name": "สาทร",
         "vibe": "โรงแรม–สำนักงาน–คลอง",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "ตึกสำนักงานสูง", "roof": "#4a5a8a", "sign": "#9fb0f0" },
+          "houseRoof": "#5a6a8a"
+        },
         "neighborhoods": [
           { "id": "sathorn", "name": "สาทร", "vibe": "สำนักงาน โรงแรม รถติด", "zone": "silom", "rent": 1.4, "salary": 1.15, "tags": ["office", "hotel"] },
           { "id": "saintlouis", "name": "เซนต์หลุยส์", "vibe": "โรงเรียน โรงพยาบาล ซอยเงียบ", "zone": "bangrak", "rent": 1.2, "salary": 1.03, "tags": ["school", "hospital"] },
-          { "id": "yannawa", "name": "ยานนาวา", "vibe": "ริมน้ำ ชุมชนเก่า รถไฟ", "zone": "bangrak", "rent": 1.0, "salary": 0.96, "tags": ["riverside", "local"] }
+          { "id": "yannawa", "name": "ยานนาวา", "vibe": "ริมน้ำ ชุมชนเก่า รถไฟ", "zone": "bangrak", "rent": 1, "salary": 0.96, "tags": ["riverside", "local"] }
         ]
       },
       {
         "id": "watthana",
         "name": "วัฒนา",
         "vibe": "อโศก–ทองหล่อ–ไนท์ไลฟ์",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" },
+          "houseRoof": "#5a6a8a"
+        },
         "neighborhoods": [
           { "id": "asok", "name": "อโศก", "vibe": "ออฟฟิศ รถไฟฟ้า ต่างชาติ", "zone": "silom", "rent": 1.55, "salary": 1.2, "tags": ["office", "bts"] },
           { "id": "thonglor", "name": "ทองหล่อ", "vibe": "คาเฟ่ บาร์ คอนโดหรู", "zone": "khlongtoei", "rent": 1.5, "salary": 1.16, "tags": ["night", "cafe"] },
@@ -82,8 +128,14 @@
         "id": "chatuchak",
         "name": "จตุจักร",
         "vibe": "ตลาดนัด–คมนาคม–ที่อยู่อาศัย",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "chatuchak", "name": "จตุจักร", "vibe": "ตลาดนัด รถไฟ สวน", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["market", "transport"] },
+          { "id": "chatuchak", "name": "จตุจักร", "vibe": "ตลาดนัด รถไฟ สวน", "zone": "", "rent": 1, "salary": 1, "tags": ["market", "transport"] },
           { "id": "ladyao", "name": "ลาดยาว", "vibe": "บ้านจัดสรร ตลาดท้องถิ่น", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["residential"] },
           { "id": "senanikhom", "name": "เสนานิคม", "vibe": "โรงเรียน ครอบครัว ริมคลอง", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["school"] }
         ]
@@ -97,23 +149,36 @@
     "region": "กลาง",
     "salary": 0.93,
     "rent": 0.78,
+    "map": { "palette": "central", "region": "central", "inlandWater": "canal", "roadLayout": "grid" },
     "districts": [
       {
         "id": "mueang-nonthaburi",
         "name": "เมืองนนทบุรี",
         "vibe": "ศาลากลาง–ริมเจ้าพระยา",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "tha-it", "name": "ท่าอิฐ", "vibe": "ตลาดเก่า ริมน้ำ", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["riverside", "market"] },
+          { "id": "tha-it", "name": "ท่าอิฐ", "vibe": "ตลาดเก่า ริมน้ำ", "zone": "", "rent": 1, "salary": 1, "tags": ["riverside", "market"] },
           { "id": "talat-khwan", "name": "ตลาดขวัญ", "vibe": "ศูนย์ราชการ ขนส่ง", "zone": "", "rent": 1.05, "salary": 1.02, "tags": ["office", "transport"] },
-          { "id": "bang-kraso", "name": "บางกระสอ", "vibe": "โรงพยาบาล มหาวิทยาลัย", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["hospital", "campus"] }
+          { "id": "bang-kraso", "name": "บางกระสอ", "vibe": "โรงพยาบาล มหาวิทยาลัย", "zone": "", "rent": 1, "salary": 1, "tags": ["hospital", "campus"] }
         ]
       },
       {
         "id": "pak-kret",
         "name": "ปากเกร็ด",
         "vibe": "ริมน้ำ–เกาะเกร็ด–ที่อยู่อาศัย",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "pak-kret", "name": "ปากเกร็ด", "vibe": "ตลาดน้ำ ริมเจ้าพระยา", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["riverside", "market"] },
+          { "id": "pak-kret", "name": "ปากเกร็ด", "vibe": "ตลาดน้ำ ริมเจ้าพระยา", "zone": "", "rent": 1, "salary": 1, "tags": ["riverside", "market"] },
           { "id": "ko-kret", "name": "เกาะเกร็ด", "vibe": "เครื่องปั้นดินเผา ชุมชนมอญ", "zone": "", "rent": 0.85, "salary": 0.9, "tags": ["craft", "community"] },
           { "id": "bang-phut", "name": "บางพูด", "vibe": "บ้านจัดสรร ทางด่วน", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["residential"] }
         ]
@@ -122,8 +187,14 @@
         "id": "bang-yai",
         "name": "บางใหญ่",
         "vibe": "ชานเมือง–ห้างใหญ่",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "bang-yai", "name": "บางใหญ่", "vibe": "ห้างสรรพสินค้า ทางด่วน", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["retail"] },
+          { "id": "bang-yai", "name": "บางใหญ่", "vibe": "ห้างสรรพสินค้า ทางด่วน", "zone": "", "rent": 1, "salary": 1, "tags": ["retail"] },
           { "id": "sao-thong-hin", "name": "เสาธงหิน", "vibe": "บ้านจัดสรร เงียบ", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["residential"] }
         ]
       },
@@ -131,6 +202,12 @@
         "id": "bang-bua-thong",
         "name": "บางบัวทอง",
         "vibe": "ที่อยู่อาศัย–นิคม",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "bang-bua-thong", "name": "บางบัวทอง", "vibe": "ตลาด โรงงาน", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["industrial"] },
           { "id": "phimonrat", "name": "พิมลราช", "vibe": "บ้านจัดสรร ครอบครัว", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["residential"] }
@@ -145,13 +222,20 @@
     "region": "กลาง",
     "salary": 0.9,
     "rent": 0.72,
+    "map": { "palette": "central", "region": "central", "inlandWater": "canal", "roadLayout": "grid" },
     "districts": [
       {
         "id": "mueang-pathum-thani",
         "name": "เมืองปทุมธานี",
         "vibe": "ริมเจ้าพระยา–ตลาดเก่า",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "bang-prok", "name": "บางปรอก", "vibe": "ศาลากลาง ริมน้ำ", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["riverside"] },
+          { "id": "bang-prok", "name": "บางปรอก", "vibe": "ศาลากลาง ริมน้ำ", "zone": "", "rent": 1, "salary": 1, "tags": ["riverside"] },
           { "id": "bang-kadi", "name": "บางกะดี", "vibe": "นิคมอุตสาหกรรม", "zone": "", "rent": 0.95, "salary": 1.02, "tags": ["industrial"] },
           { "id": "talat-pathum", "name": "ตลาดปทุม", "vibe": "ตลาดสด อาหาร", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["market"] }
         ]
@@ -160,8 +244,14 @@
         "id": "khlong-luang",
         "name": "คลองหลวง",
         "vibe": "มหาวิทยาลัย–นิคม",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "khlong-nueng", "name": "คลองหนึ่ง", "vibe": "ตลาด มหาวิทยาลัย", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["campus"] },
+          { "id": "khlong-nueng", "name": "คลองหนึ่ง", "vibe": "ตลาด มหาวิทยาลัย", "zone": "", "rent": 1, "salary": 1, "tags": ["campus"] },
           { "id": "khlong-song", "name": "คลองสอง", "vibe": "บ้านเช่า โรงงาน", "zone": "", "rent": 0.85, "salary": 0.95, "tags": ["rental"] },
           { "id": "thammasat", "name": "ธรรมศาสตร์", "vibe": "มหาวิทยาลัย ริมคลอง", "zone": "", "rent": 0.95, "salary": 0.98, "tags": ["campus"] }
         ]
@@ -170,8 +260,14 @@
         "id": "thanyaburi",
         "name": "ธัญบุรี",
         "vibe": "รังสิต–ตลาด–ที่อยู่อาศัย",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "rangsit", "name": "รังสิต", "vibe": "ตลาดใหญ่ นักศึกษา", "zone": "", "rent": 1.05, "salary": 1.0, "tags": ["market", "student"] },
+          { "id": "rangsit", "name": "รังสิต", "vibe": "ตลาดใหญ่ นักศึกษา", "zone": "", "rent": 1.05, "salary": 1, "tags": ["market", "student"] },
           { "id": "khlong-hok", "name": "คลองหก", "vibe": "มหาวิทยาลัย โรงงาน", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["campus"] },
           { "id": "prachathipat", "name": "ประชาธิปัตย์", "vibe": "บ้านจัดสรร ตลาด", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["residential"] }
         ]
@@ -180,8 +276,14 @@
         "id": "lam-luk-ka",
         "name": "ลำลูกกา",
         "vibe": "ชานเมือง–สนามบิน–บ้านจัดสรร",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "khu-khot", "name": "คูคต", "vibe": "รถไฟฟ้า ตลาด", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["transport"] },
+          { "id": "khu-khot", "name": "คูคต", "vibe": "รถไฟฟ้า ตลาด", "zone": "", "rent": 1, "salary": 1, "tags": ["transport"] },
           { "id": "lam-luk-ka", "name": "ลำลูกกา", "vibe": "บ้านจัดสรร คลอง", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["residential"] }
         ]
       }
@@ -194,13 +296,20 @@
     "region": "กลาง",
     "salary": 0.92,
     "rent": 0.76,
+    "map": { "palette": "central", "region": "central", "inlandWater": "pond", "roadLayout": "grid" },
     "districts": [
       {
         "id": "mueang-samut-prakan",
         "name": "เมืองสมุทรปราการ",
         "vibe": "ปากน้ำ–ท่าเรือ–โรงงาน",
+        "map": {
+          "archetype": "town",
+          "coastal": true,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "pak-nam", "name": "ปากน้ำ", "vibe": "ศาลากลาง ตลาด ท่าเรือ", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["port", "market"] },
+          { "id": "pak-nam", "name": "ปากน้ำ", "vibe": "ศาลากลาง ตลาด ท่าเรือ", "zone": "", "rent": 1, "salary": 1, "tags": ["port", "market"] },
           { "id": "thai-ban", "name": "ท้ายบ้าน", "vibe": "ชุมชนริมน้ำ โรงงาน", "zone": "", "rent": 0.85, "salary": 0.95, "tags": ["industrial"] },
           { "id": "bang-pu", "name": "บางปู", "vibe": "ชายทะเล นกอพยพ", "zone": "", "rent": 0.8, "salary": 0.9, "tags": ["coast", "nature"] }
         ]
@@ -209,9 +318,15 @@
         "id": "bang-phli",
         "name": "บางพลี",
         "vibe": "สนามบิน–นิคม–บ้านจัดสรร",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "bang-phli", "name": "บางพลี", "vibe": "ตลาดเก่า วัด", "zone": "", "rent": 0.95, "salary": 1.0, "tags": ["market"] },
-          { "id": "king-kaew", "name": "กิ่งแก้ว", "vibe": "นิคม สนามบิน", "zone": "", "rent": 1.0, "salary": 1.05, "tags": ["industrial", "airport"] },
+          { "id": "bang-phli", "name": "บางพลี", "vibe": "ตลาดเก่า วัด", "zone": "", "rent": 0.95, "salary": 1, "tags": ["market"] },
+          { "id": "king-kaew", "name": "กิ่งแก้ว", "vibe": "นิคม สนามบิน", "zone": "", "rent": 1, "salary": 1.05, "tags": ["industrial", "airport"] },
           { "id": "suwannabhumi", "name": "สุวรรณภูมิ", "vibe": "สนามบิน โรงแรม", "zone": "", "rent": 1.1, "salary": 1.08, "tags": ["airport", "hotel"] }
         ]
       },
@@ -219,6 +334,12 @@
         "id": "phra-pradaeng",
         "name": "พระประแดง",
         "vibe": "เกาะ–ชุมชนมอญ–สวน",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "phra-pradaeng", "name": "พระประแดง", "vibe": "ตลาดเก่า ริมน้ำ", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["riverside", "market"] },
           { "id": "pu-chao-saming-phrai", "name": "ปู่เจ้าสมิงพราย", "vibe": "ชุมชน โรงงาน", "zone": "", "rent": 0.85, "salary": 0.95, "tags": ["industrial"] }
@@ -228,9 +349,15 @@
         "id": "bang-sao-thong",
         "name": "บางเสาธง",
         "vibe": "นิคม–สนามบิน–ชานเมือง",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "bang-sao-thong", "name": "บางเสาธง", "vibe": "บ้านจัดสรร ทางด่วน", "zone": "", "rent": 0.85, "salary": 0.95, "tags": ["residential"] },
-          { "id": "bang-pu-mai", "name": "บางปูใหม่", "vibe": "นิคมอุตสาหกรรม", "zone": "", "rent": 0.9, "salary": 1.0, "tags": ["industrial"] }
+          { "id": "bang-pu-mai", "name": "บางปูใหม่", "vibe": "นิคมอุตสาหกรรม", "zone": "", "rent": 0.9, "salary": 1, "tags": ["industrial"] }
         ]
       }
     ]
@@ -242,14 +369,21 @@
     "region": "เหนือ",
     "salary": 0.85,
     "rent": 0.68,
+    "map": { "palette": "north", "region": "north", "inlandWater": "canal", "roadLayout": "no-east" },
     "districts": [
       {
         "id": "mueang-chiang-mai",
         "name": "เมืองเชียงใหม่",
         "vibe": "คูเมือง–นิมมาน–วัด",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "lanna",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "nimman", "name": "นิมมานเหมินท์", "vibe": "คาเฟ่ ครีเอทีฟ ต่างชาติ", "zone": "", "rent": 1.25, "salary": 1.12, "tags": ["cafe", "creative"] },
-          { "id": "chaiyaphum", "name": "ในเมือง", "vibe": "คูเมือง ตลาด วัด", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["heritage", "market"] },
+          { "id": "chaiyaphum", "name": "ในเมือง", "vibe": "คูเมือง ตลาด วัด", "zone": "", "rent": 1, "salary": 1, "tags": ["heritage", "market"] },
           { "id": "chang-khlan", "name": "ช้างคลาน", "vibe": "ไนท์บาซาร์ โรงแรม", "zone": "", "rent": 1.1, "salary": 1.05, "tags": ["night", "hotel"] },
           { "id": "santitham", "name": "สันติธรรม", "vibe": "ชุมชนคนเมือง คาเฟ่", "zone": "", "rent": 1.05, "salary": 1.02, "tags": ["local", "cafe"] }
         ]
@@ -258,6 +392,12 @@
         "id": "san-sai",
         "name": "สันทราย",
         "vibe": "มหาวิทยาลัย–ชานเมือง",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "lanna",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "san-sai", "name": "สันทราย", "vibe": "ตลาด บ้านเช่า", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["rental"] },
           { "id": "mae-jo", "name": "แม่โจ้", "vibe": "มหาวิทยาลัยเกษตร", "zone": "", "rent": 0.85, "salary": 0.95, "tags": ["campus"] }
@@ -267,6 +407,12 @@
         "id": "hang-dong",
         "name": "หางดง",
         "vibe": "หัตถกรรม–ชานเมือง",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "lanna",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "hang-dong", "name": "หางดง", "vibe": "ตลาด งานไม้", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["craft"] },
           { "id": "nam-phrae", "name": "น้ำแพร่", "vibe": "หมู่บ้าน หัตถกรรม", "zone": "", "rent": 0.8, "salary": 0.9, "tags": ["craft"] }
@@ -276,6 +422,12 @@
         "id": "mae-rim",
         "name": "แม่ริม",
         "vibe": "ภูเขา–สวน–รีสอร์ต",
+        "map": {
+          "archetype": "rural",
+          "coastal": false,
+          "wat": "lanna",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "mae-rim", "name": "แม่ริม", "vibe": "ตลาด ทางขึ้นดอย", "zone": "", "rent": 0.85, "salary": 0.9, "tags": ["nature"] },
           { "id": "rim-tai", "name": "ริมใต้", "vibe": "รีสอร์ต ธรรมชาติ", "zone": "", "rent": 0.9, "salary": 0.92, "tags": ["resort"] }
@@ -290,15 +442,22 @@
     "region": "อีสาน",
     "salary": 0.8,
     "rent": 0.6,
+    "map": { "palette": "isan", "region": "isan", "inlandWater": "pond", "roadLayout": "no-south" },
     "districts": [
       {
         "id": "mueang-khon-kaen",
         "name": "เมืองขอนแก่น",
         "vibe": "บึงแก่นนคร–มหาวิทยาลัย",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "mueang-kao", "name": "เมืองเก่า", "vibe": "ตลาดเก่า วัด ศาล", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["heritage", "market"] },
+          { "id": "mueang-kao", "name": "เมืองเก่า", "vibe": "ตลาดเก่า วัด ศาล", "zone": "", "rent": 1, "salary": 1, "tags": ["heritage", "market"] },
           { "id": "bueng-kaen-nakhon", "name": "บึงแก่นนคร", "vibe": "สวนสาธารณะ ริมบึง", "zone": "", "rent": 1.05, "salary": 1.02, "tags": ["park"] },
-          { "id": "kku", "name": "มหาวิทยาลัยขอนแก่น", "vibe": "นักศึกษา โรงพยาบาล", "zone": "", "rent": 0.95, "salary": 1.0, "tags": ["campus"] },
+          { "id": "kku", "name": "มหาวิทยาลัยขอนแก่น", "vibe": "นักศึกษา โรงพยาบาล", "zone": "", "rent": 0.95, "salary": 1, "tags": ["campus"] },
           { "id": "si-chan", "name": "ศรีจันทร์", "vibe": "ถนนอาหาร โรงแรม", "zone": "", "rent": 1.1, "salary": 1.05, "tags": ["food", "hotel"] }
         ]
       },
@@ -306,6 +465,12 @@
         "id": "ban-phai",
         "name": "บ้านไผ่",
         "vibe": "ชุมทาง–ตลาด",
+        "map": {
+          "archetype": "rural",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "ban-phai", "name": "บ้านไผ่", "vibe": "ตลาด รถไฟ", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["market", "transport"] },
           { "id": "nong-nam-sai", "name": "หนองน้ำใส", "vibe": "หมู่บ้าน เกษตร", "zone": "", "rent": 0.75, "salary": 0.88, "tags": ["farm"] }
@@ -315,6 +480,12 @@
         "id": "chum-phae",
         "name": "ชุมแพ",
         "vibe": "การค้า–เกษตร",
+        "map": {
+          "archetype": "rural",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "chum-phae", "name": "ชุมแพ", "vibe": "ตลาดใหญ่ โรงงานมัน", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["market", "farm"] },
           { "id": "non-sa-at", "name": "โนนสะอาด", "vibe": "หมู่บ้าน เกษตร", "zone": "", "rent": 0.75, "salary": 0.88, "tags": ["farm"] }
@@ -324,6 +495,12 @@
         "id": "nam-phong",
         "name": "น้ำพอง",
         "vibe": "น้ำตก–โรงงาน",
+        "map": {
+          "archetype": "rural",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "nam-phong", "name": "น้ำพอง", "vibe": "ตลาด โรงงาน", "zone": "", "rent": 0.8, "salary": 0.9, "tags": ["industrial"] },
           { "id": "kham-muang", "name": "คำม่วง", "vibe": "หมู่บ้าน ธรรมชาติ", "zone": "", "rent": 0.7, "salary": 0.85, "tags": ["nature"] }
@@ -338,13 +515,20 @@
     "region": "ตะวันออก",
     "salary": 0.9,
     "rent": 0.72,
+    "map": { "palette": "east", "region": "east", "inlandWater": "pond", "roadLayout": "no-west" },
     "districts": [
       {
         "id": "mueang-chonburi",
         "name": "เมืองชลบุรี",
         "vibe": "เมือง–บางแสน–ทะเล",
+        "map": {
+          "archetype": "town",
+          "coastal": true,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "chonburi-town", "name": "ตัวเมืองชลบุรี", "vibe": "ศาลากลาง ตลาด", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["market"] },
+          { "id": "chonburi-town", "name": "ตัวเมืองชลบุรี", "vibe": "ศาลากลาง ตลาด", "zone": "", "rent": 1, "salary": 1, "tags": ["market"] },
           { "id": "bangsaen", "name": "บางแสน", "vibe": "หาด นักศึกษา อาหารทะเล", "zone": "", "rent": 1.1, "salary": 1.02, "tags": ["beach", "student"] },
           { "id": "saensuk", "name": "แสนสุข", "vibe": "ชายหาด โรงแรม", "zone": "", "rent": 1.15, "salary": 1.05, "tags": ["beach", "hotel"] }
         ]
@@ -353,6 +537,12 @@
         "id": "bang-lamung",
         "name": "บางละมุง",
         "vibe": "พัทยา–หาด–ไนท์ไลฟ์",
+        "map": {
+          "archetype": "town",
+          "coastal": true,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "pattaya", "name": "พัทยา", "vibe": "หาด ไนท์ไลฟ์ โรงแรม", "zone": "", "rent": 1.35, "salary": 1.15, "tags": ["beach", "night"] },
           { "id": "jomtien", "name": "จอมเทียน", "vibe": "หาดยาว คอนโด", "zone": "", "rent": 1.2, "salary": 1.08, "tags": ["beach", "condo"] },
@@ -363,8 +553,14 @@
         "id": "si-racha",
         "name": "ศรีราชา",
         "vibe": "ท่าเรือ–นิคม–มหาวิทยาลัย",
+        "map": {
+          "archetype": "town",
+          "coastal": true,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "si-racha", "name": "ศรีราชา", "vibe": "ตลาด ท่าเรือ", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["port"] },
+          { "id": "si-racha", "name": "ศรีราชา", "vibe": "ตลาด ท่าเรือ", "zone": "", "rent": 1, "salary": 1, "tags": ["port"] },
           { "id": "laem-chabang", "name": "แหลมฉบัง", "vibe": "นิคม ท่าเรือใหญ่", "zone": "", "rent": 1.05, "salary": 1.08, "tags": ["port", "industrial"] },
           { "id": "ao-udom", "name": "อ่าวอุดม", "vibe": "นิคม บ้านเช่า", "zone": "", "rent": 0.95, "salary": 1.02, "tags": ["industrial"] }
         ]
@@ -373,6 +569,12 @@
         "id": "sattahip",
         "name": "สัตหีบ",
         "vibe": "ฐานทัพ–เกาะ–ทะเล",
+        "map": {
+          "archetype": "town",
+          "coastal": true,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "sattahip", "name": "สัตหีบ", "vibe": "ฐานทัพ ตลาด", "zone": "", "rent": 0.95, "salary": 0.98, "tags": ["military"] },
           { "id": "phlu-ta-luang", "name": "พลูตาหลวง", "vibe": "ท่าเรือ ฐานทัพ", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["port"] },
@@ -388,14 +590,21 @@
     "region": "ใต้",
     "salary": 0.83,
     "rent": 0.62,
+    "map": { "palette": "south", "region": "south", "inlandWater": "pond", "roadLayout": "no-east-west" },
     "districts": [
       {
         "id": "mueang-songkhla",
         "name": "เมืองสงขลา",
         "vibe": "ทะเลสาบ–เมืองเก่า–หาด",
+        "map": {
+          "archetype": "town",
+          "coastal": true,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
-          { "id": "bo-yang", "name": "บ่อยาง", "vibe": "เมืองเก่า ริมทะเลสาบ", "zone": "", "rent": 1.0, "salary": 1.0, "tags": ["heritage", "lake"] },
-          { "id": "khao-ru-pchang", "name": "เขารูปช้าง", "vibe": "มหาวิทยาลัย โรงพยาบาล", "zone": "", "rent": 0.95, "salary": 1.0, "tags": ["campus"] },
+          { "id": "bo-yang", "name": "บ่อยาง", "vibe": "เมืองเก่า ริมทะเลสาบ", "zone": "", "rent": 1, "salary": 1, "tags": ["heritage", "lake"] },
+          { "id": "khao-ru-pchang", "name": "เขารูปช้าง", "vibe": "มหาวิทยาลัย โรงพยาบาล", "zone": "", "rent": 0.95, "salary": 1, "tags": ["campus"] },
           { "id": "ko-yo", "name": "เกาะยอ", "vibe": "เกาะ ผ้าทอ อาหารทะเล", "zone": "", "rent": 0.8, "salary": 0.9, "tags": ["island", "craft"] }
         ]
       },
@@ -403,9 +612,15 @@
         "id": "hat-yai",
         "name": "หาดใหญ่",
         "vibe": "เศรษฐกิจ–ตลาด–มหาวิทยาลัย",
+        "map": {
+          "archetype": "urban",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "hat-yai", "name": "หาดใหญ่", "vibe": "ตลาด โรงแรม อาหาร", "zone": "", "rent": 1.2, "salary": 1.12, "tags": ["market", "hotel"] },
-          { "id": "kho-hong", "name": "คอหงส์", "vibe": "มหาวิทยาลัย บ้านเช่า", "zone": "", "rent": 1.0, "salary": 1.02, "tags": ["campus"] },
+          { "id": "kho-hong", "name": "คอหงส์", "vibe": "มหาวิทยาลัย บ้านเช่า", "zone": "", "rent": 1, "salary": 1.02, "tags": ["campus"] },
           { "id": "khlong-hae", "name": "คลองแห", "vibe": "ชุมชน เกษตร", "zone": "", "rent": 0.85, "salary": 0.92, "tags": ["farm"] }
         ]
       },
@@ -413,15 +628,27 @@
         "id": "sadao",
         "name": "สะเดา",
         "vibe": "ชายแดน–การค้า",
+        "map": {
+          "archetype": "town",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "sadao", "name": "สะเดา", "vibe": "ตลาดชายแดน", "zone": "", "rent": 0.9, "salary": 0.95, "tags": ["border", "market"] },
-          { "id": "dan-nok", "name": "ด่านนอก", "vibe": "ด่านชายแดน การค้า", "zone": "", "rent": 0.95, "salary": 1.0, "tags": ["border"] }
+          { "id": "dan-nok", "name": "ด่านนอก", "vibe": "ด่านชายแดน การค้า", "zone": "", "rent": 0.95, "salary": 1, "tags": ["border"] }
         ]
       },
       {
         "id": "na-thawi",
         "name": "นาทวี",
         "vibe": "เกษตร–ป่า–ชุมชน",
+        "map": {
+          "archetype": "rural",
+          "coastal": false,
+          "wat": "thai",
+          "landmark": { "name": "อนุสาวรีย์ประจำเมือง", "roof": "#7a6a52", "sign": "#ffd75e" }
+        },
         "neighborhoods": [
           { "id": "na-thawi", "name": "นาทวี", "vibe": "ตลาด เกษตร", "zone": "", "rent": 0.75, "salary": 0.88, "tags": ["farm"] },
           { "id": "chang", "name": "ฉาง", "vibe": "หมู่บ้าน เกษตร", "zone": "", "rent": 0.7, "salary": 0.85, "tags": ["farm"] }

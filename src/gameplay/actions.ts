@@ -1,5 +1,5 @@
 /* OpenLife — world actions (scene entry, daily activities, work) */
-import { clamp } from './util';
+import { clamp } from '../core/util';
 
 export interface ActionContext {
   stats: any;

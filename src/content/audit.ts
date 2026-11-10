@@ -64,7 +64,7 @@ export function dataAudit(ctx: AuditContext) {
         }
         (ev.choices || []).forEach(function (c: any, i: number) {
           if (!c.label) issues.push(label + ' choice ' + i + ' ไม่มี label');
-          if (!c.apply && !c.fx && !(c.random && c.random.length)) issues.push(label + ' choice ' + i + ' ไม่มีผล (fx/apply)');
+          if (!c.apply && !c.fx && !(c.ops && c.ops.length) && !(c.random && c.random.length)) issues.push(label + ' choice ' + i + ' ไม่มีผล (fx/ops/apply)');
           if (c.fx) {
             Object.keys(c.fx).forEach(function (k) {
               if (allowedFx.indexOf(k) < 0) issues.push(label + ' choice ' + i + ' fx key ไม่รู้จัก: ' + k);

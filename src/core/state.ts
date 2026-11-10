@@ -1,9 +1,9 @@
 /* OpenLife — state กลางของเกม (stats/world/flags/profile/finance/career/debts/life)
    ย้ายออกมาจาก game.ts เพื่อให้มี type ชัดเจน — ค่าเริ่มต้นต้องตรงกับของเดิมทุกตัว
    object ทั้งหมดเป็น const: แก้ค่าได้ แต่ห้าม reassign (ทุกโมดูลถือ reference เดียวกัน) */
-import financeSeed from './data/finance.json';
-import debtsSeed from './data/debts.json';
-import type { Appearance } from './appearance';
+import financeSeed from '../data/finance.json';
+import debtsSeed from '../data/debts.json';
+import type { Appearance } from '../character/appearance';
 
 /* ---------- types ---------- */
 

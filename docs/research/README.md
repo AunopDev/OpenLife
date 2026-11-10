@@ -1,7 +1,7 @@
 # OpenLife — Research Cards
 
 > กฎ: **ห้าม implement เนื้อหา/แผนที่/ระบบที่อิงโลกจริงก่อนมี research card**
-> ดูรายละเอียดกฎใน `AGENTS.md` §0
+> ดูรายละเอียดกฎใน `docs/rules/research.md`
 
 ## วิธีใช้
 1. สร้างไฟล์ `<province>-<district>.md` หรือ `<topic>.md`
@@ -14,6 +14,8 @@
 
 ```md
 # <ชื่อจังหวัด> — <ชื่อเขต/หัวข้อ>
+
+> geo: <province-id>/<district-id>   (ระดับจังหวัดใช้ `geo: <province-id>` — บังคับสำหรับ card พื้นที่)
 
 ## 1. คำถามที่ต้องตอบ
 ## 2. ข้อเท็จจริงหลัก

@@ -16,7 +16,20 @@ export interface BuildingSpec extends Rect {
   wall: string;
   sign: string;
 }
-export interface HouseSpec extends Rect { roof: string; roofDark: string; wall?: string; }
+/** ชนิดบ้าน: ตึกแถว / บ้านเดี่ยวหลังคาปั้นหยา / บ้านไม้ยกใต้ถุน */
+export type HouseKind = 'shophouse' | 'house' | 'stilt';
+export interface HouseSpec extends Rect { roof: string; roofDark: string; wall?: string; kind?: HouseKind; }
+
+/** ความหนาแน่นของเมือง (การประมาณของเกม — ดู docs/research/city-streetscape-art.md §8) */
+export type CityArchetype = 'urban' | 'town' | 'rural';
+export type CityRegion = 'bangkok' | 'central' | 'north' | 'isan' | 'east' | 'south';
+export type WatStyle = 'thai' | 'lanna' | 'chinese';
+export interface CityStyle {
+  archetype: CityArchetype;
+  region: CityRegion;
+  wat: WatStyle;
+  coastal: boolean;
+}
 export interface TreeSpec { x: number; y: number; v: number; }
 export interface PropSpec { type: string; x: number; y: number; v?: number; }
 export interface HotspotSpec { id: string; x: number; y: number; r: number; label: string; act: string; }
@@ -42,6 +55,8 @@ export interface DistrictSpec {
   spawn: { x: number; y: number };
   palette: any;
   pier?: Rect;
+  /** มีเฉพาะแผนที่เมืองจาก city-maps.ts → วาดด้วย src/render/city-map-art.ts */
+  style?: CityStyle;
   /** ใช้ตัดสินโซนสำหรับ audit */
   zoneRects: { water: Rect[]; road: Rect[]; sidewalk: Rect[]; sand: Rect[]; mangrove: Rect[] };
 }

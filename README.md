@@ -30,35 +30,29 @@ npm run preview  # preview dist/
 
 ## Project
 
+โครงโฟลเดอร์ฉบับเต็มและกฎการวางไฟล์: [docs/rules/code.md §2](docs/rules/code.md) · กฎทั้งหมด: [AGENTS.md](AGENTS.md)
+
 ```
-index.html
 src/
-  main.ts        entry
-  game.ts        game engine (ทยอยแยกโมดูล)
-  audio.ts       SFX + procedural music + mute
-  events.ts      JSON event compiler + ops engine
-  event-pools.ts JSON event loader + requires matcher
-  districts.ts   8 districts + districtAt/districtStyle
-  audit.ts       data/narrative/invariant audits
-  save.ts        save/load v3
-  actions.ts     scene entry + daily activities + work
-  picker.ts      cross-run event memory
-  util.ts        clamp/fmt/rnd
-  date.ts        calendar helpers
-  world-data.ts  buildings/trees/houses
-  style.css
-  data/          JSON: chapters, backgrounds, dreams, provinces, career, finance, debts, events, event-pools
-prototype/       legacy vanilla-JS prototype (อ้างอิงย้อนกลับ)
-docs/GDD.md      design source of truth
-AGENTS.md        development + narrative-consistency rules
+  main.ts · game.ts (กำลังแยก) · style.css
+  core/      state, save, date, util, picker
+  sim/       time, economy, family (ตรรกะ pure)
+  content/   events, event-pools, audit
+  world/     geo, districts, district-maps, city-maps, map-audit, world-data
+  render/    วาดภาพ  ·  character/  ตัวละคร  ·  gameplay/  กิจกรรม  ·  ui/  เมนู  ·  audio/  เสียง
+  data/      JSON (geo + ค่าตั้งแผนที่, events, chapters, ...)
+tests/       unit (Vitest) · e2e (Playwright) · saves
+docs/        GDD · BALANCE · BUGS · rules/ · research/
+prototype/   legacy (ห้ามแก้)
 ```
 
 ## Quality gates
 
 ```bash
-npx tsc --noEmit
-npm run build
+npm run check    # typecheck + unit test + build + e2e (3 ขนาดจอ) — ต้องผ่านก่อนส่งงาน
+npm run test     # unit test อย่างเดียว
 ```
+เครื่องใหม่: `npx playwright install chromium` ครั้งเดียว · ภาพหน้าจอ: `test-results/screens/`
 
 ในเกม:
 ```js
@@ -80,7 +74,7 @@ __ol.invariantAudit()    // state invariants
 - Activity points: 3/5/7/9 actions for +1/+3/+6/+12 months, repeated actions give 100/50/25/0% benefit
 - Manual hybrid time: advance +1/+3/+6/+12 months; salary, bills, interest and yearly review scale with months
 - กิจกรรม 3–9 ครั้ง/ช่วงเวลา + เดินเวลาเอง, เงินเฟ้อ, เครดิตกำหนดบ้าน, ย้ายถิ่น, event ฤดูกาล, tutorial
-- WebAudio SFX + procedural music + ปุ่ม mute (`src/audio.ts`), touch controls สำหรับมือถือ
+- WebAudio SFX + procedural music + ปุ่ม mute (`src/audio/audio.ts`), touch controls สำหรับมือถือ
 - Event แบบ declarative (`src/data/events.json` + `event-pools.json`) + ops engine (stat/rel/flag/salary/debt)
 - 8 districts with own colors, rooftop details, street props, night glows, day/night activities, and district events
 - Top-down cars for both axes, character arm-swing, smooth camera follow

@@ -938,13 +938,7 @@ body.is-touch .ctl-hint { display: none; }
   white-space: nowrap;
 }
 
-@media (pointer: coarse) and (orientation: portrait) {
-  .rotate-hint {
-    top: auto;
-    bottom: calc(112px + env(safe-area-inset-bottom));
-  }
-  .rotate-hint { display: block; }
-}
+/* คำใบ้ "หมุนจอ" ปิดถาวร — แนวตั้งต้องเล่นได้ดีเท่าแนวนอน (Responsive: ux-ui.md §1) */
 
 /* ==========================================================
    RESPONSIVE HUD
@@ -1110,8 +1104,29 @@ body.is-touch .ctl-hint { display: none; }
   .coach-actions { margin-top: 8px; }
 }
 
+/* modal เปิดอยู่: toast ขึ้นบนสุดและเว้นที่ด้านบนของ overlay ไว้ให้ toast (B-006) — ต้องอยู่หลังกฎ #toast ของ breakpoint อื่น */
+body.modal-open #toast {
+  top: calc(10px + env(safe-area-inset-top));
+  bottom: auto;
+  left: 50%;
+  max-width: min(560px, 92vw);
+}
+body.modal-open .overlay { padding-top: calc(60px + env(safe-area-inset-top)); }
+/* ระหว่างเปิด modal แสดงเฉพาะ toast ล่าสุด (อันใหม่ต่อท้าย) ให้พอดีพื้นที่ที่เว้นไว้ */
+body.modal-open #toast .toast-item:not(:last-child) { display: none; }
+
 /* portrait phones: stack and save space */
 @media (orientation: portrait) and (max-width: 900px) {
+  /* โลกเกมเต็มพื้นที่ระหว่าง HUD บน-ล่าง (B-001) — ค่ามาจาก placeWorldBetweenHud() ใน game.ts */
+  #world {
+    left: 0;
+    right: 0;
+    top: var(--world-top, 0px);
+    bottom: var(--world-bottom, 0px);
+    width: auto;
+    height: auto;
+    transform: none;
+  }
   .stat-panel {
     top: auto;
     bottom: calc(8px + env(safe-area-inset-bottom));

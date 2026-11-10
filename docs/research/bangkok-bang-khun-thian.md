@@ -1,5 +1,7 @@
 # กรุงเทพมหานคร — เขตบางขุนเทียน
 
+> geo: bangkok/bangkhunthian
+
 เข้าถึงข้อมูล: 2026-11-10
 
 ## 1. คำถามที่ต้องตอบ
@@ -75,7 +77,7 @@
 
 ## 10. สถานะ implement (vertical slice)
 
-- `src/district-maps.ts` → `bangKhunThian()` ขนาด **48×32**
+- `src/world/district-maps.ts` → `bangKhunThian()` ขนาด **48×32**
 - scene: `scene = 'district'` (`prepareDistrict` / `enterDistrict` / `leaveDistrict`)
 - เข้า/ออก: hotspot ป้ายรถเมล์สายใต้บนแผนที่เมือง + hotspot “กลับเขตลุง” ในเขต
 - ภูมิประเทศในแผนที่:

@@ -65,6 +65,10 @@
         {
           "label": "รับเงินคืน 22,000",
           "fx": { "money": 22000, "heart": 2, "rel": { "friend": 5 }, "flags": { "friendArc2": true } }
+        },
+        {
+          "label": "รับแค่เงินต้น 20,000 ดอกเบี้ยให้นนท์ไว้ลงทุนต่อ",
+          "fx": { "money": 20000, "heart": 4, "rel": { "friend": 9 }, "flags": { "friendArc2": true } }
         }
       ]
     },

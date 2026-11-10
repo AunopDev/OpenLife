@@ -1,5 +1,5 @@
 /* OpenLife — districts and block identity */
-import districtData from './data/districts.json';
+import districtData from '../data/districts.json';
 
 export interface District {
   id: string;

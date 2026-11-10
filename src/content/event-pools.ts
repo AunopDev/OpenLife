@@ -1,8 +1,8 @@
 /* OpenLife — event data loader (data lives in src/data/event-pools.json) */
-import rawPools from './data/event-pools.json';
-import rawArcs from './data/arc-events.json';
-import rawRandom from './data/random-events.json';
-import rawVariants from './data/variant-events.json';
+import rawPools from '../data/event-pools.json';
+import rawArcs from '../data/arc-events.json';
+import rawRandom from '../data/random-events.json';
+import rawVariants from '../data/variant-events.json';
 
 export function createEventPools(ctx: any) {
   const {

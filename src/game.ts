@@ -5,24 +5,31 @@ import dreamsData from './data/dreams.json';
 import provincesData from './data/provinces.json';
 import careerData from './data/career.json';
 import eventsData from './data/events.json';
-import { playSfx, unlockAudio, isSoundEnabled, initSoundButton, setPageVisible } from './audio';
-import { buildJsonEvents, runOps } from './events';
-import { createEventPools } from './event-pools';
-import { clamp, fmt, rnd } from './util';
-import { WEEK, MONTHS, MDAYS, dateParts, nextMonthStart, isMonthEnd } from './date';
-import { MAP_W, MAP_H, BUILDINGS, TREES, BUSHES, SCOOTERS, LIGHTS, POND, HOUSES, OFFICE, HOME, DESKS } from './world-data';
-import { dataAudit as dataAuditImpl, invariantAudit as invariantAuditImpl, narrativeAudit as narrativeAuditImpl } from './audit';
-import { saveGame as saveGameImpl, loadGame as loadGameImpl, clearSave as clearSaveImpl, SaveContext } from './save';
-import { pickSeenEvent, markSeen, resetSeenMemory, seenCount } from './picker';
-import { createActions } from './actions';
-import { openStartMenu } from './menu';
-import { DISTRICTS, districtAt, districtById, districtStyle } from './districts';
-import { getDistrictMap, districtZone, DistrictSpec } from './district-maps';
-import { getCityMap } from './city-maps';
-import { geoDistricts, geoDistrict, geoNeighborhood, geoFinance, geoAudit, geoFindByZone } from './geo';
-import * as Look from './appearance';
-import * as LookEditor from './appearance-editor';
-import { stats, world, flags, profile, finance, career, debts, life, SAVE_KEY } from './state';
+import { playSfx, unlockAudio, isSoundEnabled, initSoundButton, setPageVisible } from './audio/audio';
+import { buildJsonEvents, runOps } from './content/events';
+import { createEventPools } from './content/event-pools';
+import { clamp, fmt, rnd, escapeHtml } from './core/util';
+import { WEEK, MONTHS, MDAYS, dateParts, nextMonthStart, isMonthEnd } from './core/date';
+import { MAP_W, MAP_H, BUILDINGS, TREES, BUSHES, SCOOTERS, LIGHTS, POND, HOUSES, OFFICE, HOME, DESKS } from './world/world-data';
+import { dataAudit as dataAuditImpl, invariantAudit as invariantAuditImpl, narrativeAudit as narrativeAuditImpl } from './content/audit';
+import { saveGame as saveGameImpl, loadGame as loadGameImpl, clearSave as clearSaveImpl, SaveContext } from './core/save';
+import { pickSeenEvent, markSeen, resetSeenMemory, seenCount } from './core/picker';
+import { createActions } from './gameplay/actions';
+import { openStartMenu } from './ui/menu';
+import { DISTRICTS, districtAt, districtById, districtStyle } from './world/districts';
+import { getDistrictMap, districtZone, DistrictSpec } from './world/district-maps';
+import { getCityMap } from './world/city-maps';
+import { auditDistrictSpec } from './world/map-audit';
+import { geoDistricts, geoDistrict, geoNeighborhood, geoFinance, geoAudit, geoFindByZone } from './world/geo';
+import * as Look from './character/appearance';
+import * as LookEditor from './character/appearance-editor';
+import { stats, world, flags, profile, finance, career, debts, life, SAVE_KEY } from './core/state';
+import { P } from './render/palette';
+import { createBills, billsPaidThisTurn, settleBillsAtMonthEnd } from './features/bills';
+import { ageYears, periodMonths, currentTurnKey } from './sim/time';
+import { RENTAL_INCOME, totalDebt, debtMinPerMonth, costInflation, housingCost, transportCost, familyCost, assetUpkeep, rentalIncome, livingCost, taxPerMonth, socialSecurityPerMonth, fixedPerMonth, lifestyleCost, billsTotalPerTurn, passiveIncomePerMonth } from './sim/economy';
+import { childAgeYears, familyTick } from './sim/family';
+import { buildCityMapArt } from './render/city-map-art';
 
 ﻿'use strict';
 
@@ -32,8 +39,9 @@ import { stats, world, flags, profile, finance, career, debts, life, SAVE_KEY } 
    ========================================================== */
 
 const TILE = 64;
-const VW = 1440;
-const VH = 900;
+// ขนาด canvas (logical px) — ปรับตามพื้นที่จริงของ #world ใน fitViewport() (Responsive: ux-ui.md §1 ข้อ 8)
+let VW = 1440;
+let VH = 900;
 
 const ART = 16;              // art pixels per tile
 const W2A = TILE / ART;      // world px per art px (= 4)
@@ -58,8 +66,8 @@ const bctx = buffer.getContext('2d');
 bctx.imageSmoothingEnabled = false;
 let ctx = bctx;
 
-function setPixelScale(p) {
-  if (Math.abs(p - PIX) < 0.001) return;
+function setPixelScale(p, force?: boolean) {
+  if (!force && Math.abs(p - PIX) < 0.001) return;
   PIX = p;
   AW = Math.ceil(VW / PIX);
   AH = Math.ceil(VH / PIX);
@@ -74,9 +82,54 @@ function fitStage() {
   document.body.classList.toggle('is-portrait', portrait);
   const coarse = isTouchUi();
   document.body.classList.toggle('is-touch', coarse);
+  placeWorldBetweenHud();
+  fitViewport();
+}
+
+/** มือถือแนวตั้ง: ให้ #world เต็มพื้นที่ระหว่างการ์ดตัวละคร (บน) กับแผงสถานะ (ล่าง) — ค่าใช้ใน style.css */
+function placeWorldBetweenHud() {
+  const root = document.documentElement;
+  const stage = document.getElementById('stage');
+  const card = document.querySelector('.char-card');
+  const stats = document.getElementById('statPanel');
+  if (!stage || !card || !stats || !window.matchMedia('(orientation: portrait) and (max-width: 900px)').matches) {
+    root.style.removeProperty('--world-top');
+    root.style.removeProperty('--world-bottom');
+    return;
+  }
+  const s = stage.getBoundingClientRect();
+  const top = Math.round(card.getBoundingClientRect().bottom - s.top + 6);
+  const bottom = Math.round(s.bottom - stats.getBoundingClientRect().top + 6);
+  root.style.setProperty('--world-top', top + 'px');
+  root.style.setProperty('--world-bottom', bottom + 'px');
+}
+
+/** ตั้งขนาด canvas ให้สัดส่วนตรงกับ #world จริง (ไม่ยืดภาพ) — จอแคบใช้ logical px น้อยลงให้พิกเซลไม่เล็กเกินอ่าน */
+function fitViewport() {
+  const el = document.getElementById('world');
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  if (r.width < 10 || r.height < 10) return;
+  const w = r.height > r.width ? Math.round(clamp(r.width * 2, 720, 1440)) : 1440;
+  const h = Math.round(w * clamp(r.height / r.width, 0.5, 2.4));
+  if (w === VW && h === VH) return;
+  VW = w;
+  VH = h;
+  cv.width = VW;
+  cv.height = VH;
+  mainCtx.imageSmoothingEnabled = false;
+  setPixelScale(PIX, true);
+  pausedRendered = false; // ให้ loop วาดใหม่แม้เกมหยุดอยู่ (เปิด modal)
 }
 window.addEventListener('resize', fitStage);
 window.addEventListener('orientationchange', function () { setTimeout(fitStage, 60); });
+// HUD เปลี่ยนความสูงได้ (ข้อความยาว/ตัดบรรทัด) → จัดพื้นที่โลกใหม่
+if ('ResizeObserver' in window) {
+  const hudObserver = new ResizeObserver(function () { fitStage(); });
+  ['statPanel'].forEach(function (id) { const el = document.getElementById(id); if (el) hudObserver.observe(el); });
+  const cardEl = document.querySelector('.char-card');
+  if (cardEl) hudObserver.observe(cardEl);
+}
 
 /* ==========================================================
    WORLD DATA
@@ -219,6 +272,7 @@ let districtSpec: DistrictSpec | null = null;
 let districtHotspotList: any[] = [];
 let artStyleOverride: any = null;
 let paused = false;
+let pausedRendered = false; // วาดเฟรมเดียวตอน pause (ต้องประกาศก่อน fitStage() ตอนบูต)
 let anim = 0;
 let shake = 0;
 let cam = { x: 0, y: 0 };
@@ -825,12 +879,14 @@ function openModal(html) {
   paused = true;
   modal.innerHTML = html;
   overlay.classList.remove('hidden');
+  document.body.classList.add('modal-open'); // toast ย้ายขึ้นบนไม่ทับ modal (B-006)
   const first = modal.querySelector('button:not([disabled])');
   if (first) first.focus();
 }
 function closeModal() {
   paused = false;
   overlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
   modal.innerHTML = '';
 }
 
@@ -869,18 +925,6 @@ function chapterData(n) {
   return CHAPTERS[(n || life.chapter) - 1];
 }
 
-function ageYears() {
-  return Math.floor(life.ageMonths / 12);
-}
-
-function periodMonths() {
-  return Math.max(1, life.plannedMonths || 1);
-}
-
-function currentTurnKey() {
-  return life.chapter + ':' + life.turn;
-}
-
 const ACTIONS_PER_TURN = 3;
 
 const HOME_COSTS = [500000, 1500000, 4000000];
@@ -895,7 +939,6 @@ const ASSET_TRIPS = [
   { name: 'ทริปยุโรป', cost: 800000, heart: 12, fun: 40, rest: 25, stamp: 1, skill: 'communication' }
 ];
 const RENTAL_COSTS = [3000000, 5000000, 8000000];
-const RENTAL_INCOME = [30000, 45000, 70000];
 
 function actionBudget() {
   const m = Math.max(1, life.periodMonths || 1);
@@ -1518,7 +1561,7 @@ function showDreamStep() {
     const d = DREAMS[i];
     const html2 =
       '<div class="ev-head"><span class="ev-chip">ยืนยัน</span><span>เริ่มชีวิต</span></div>' +
-      '<div class="ev-title">' + profile.name + '</div>' +
+      '<div class="ev-title">' + escapeHtml(profile.name) + '</div>' +
       '<div class="pay-debt">เพศ <b>' + life.gender + '</b> · เกิดที่ <b>' + life.province + '</b><br>' +
       'เขต/อำเภอ: <b>' + (life.khetName || '-') + '</b><br>' +
       'ครอบครัว: <b>' + b.name + '</b><br>ความฝัน: <b>' + d.name + '</b><br>' +
@@ -1792,7 +1835,7 @@ function openLife() {
     ? 'ธุรกิจ: <b>' + life.business.type + '</b> ระดับ ' + life.business.level + ' · +฿' + fmt(life.business.monthly) + '/เดือน'
     : 'ธุรกิจ: ยังไม่มี';
   const html =
-    '<div class="ev-head"><span class="ev-chip">ชีวิต</span><span>' + profile.name + '</span></div>' +
+    '<div class="ev-head"><span class="ev-chip">ชีวิต</span><span>' + escapeHtml(profile.name) + '</span></div>' +
     '<div class="ev-title">' + profile.age + ' ปี · ' + ch.name + '</div>' +
     '<div class="pay-debt">' +
     'จังหวัด: <b>' + life.province + '</b> · เขต/อำเภอ: <b>' + (life.khetName || '-') + '</b> · ย่าน: <b>' + (life.neighborhoodName || '-') + '</b> · เพศ: <b>' + life.gender + '</b><br>' +
@@ -1844,7 +1887,7 @@ function openIdCard() {
     '<div class="id-card">' +
     '<canvas id="idPortrait" width="32" height="32" aria-label="รูปถ่ายในบัตร"></canvas>' +
     '<div class="id-lines">' +
-    '<div class="id-row"><span>ชื่อ</span><b>' + profile.name + '</b></div>' +
+    '<div class="id-row"><span>ชื่อ</span><b>' + escapeHtml(profile.name) + '</b></div>' +
     '<div class="id-row"><span>เลขประจำตัว</span><b>' + citizenId() + '</b></div>' +
     '<div class="id-row"><span>เกิด</span><b>1 ม.ค. 2547 · ' + Math.floor(ageYears()) + ' ปี</b></div>' +
     '<div class="id-row"><span>ที่อยู่</span><b>' + addr + '</b></div>' +
@@ -2865,138 +2908,6 @@ function startMonthEnd() {
   });
 }
 
-function totalDebt() {
-  return Object.keys(debts).reduce(function (a, k) { return a + Math.max(0, debts[k].balance); }, 0);
-}
-
-function debtMinPerMonth() {
-  return Object.keys(debts).reduce(function (a, k) {
-    return a + (debts[k].balance > 0 ? debts[k].min : 0);
-  }, 0);
-}
-
-function costInflation() {
-  return 1 + Math.max(0, ageYears() - 22) * 0.02;
-}
-
-function housingCost() {
-  const base = life.flags.house ? 1500 : finance.rent;
-  return Math.round(base * costInflation());
-}
-
-function transportCost() {
-  let base;
-  if (life.flags.car === false || debts.car.repossessed) base = 1200;
-  else if (debts.car.balance <= 0) base = 2000;
-  else base = finance.transport;
-  return Math.round(base * costInflation());
-}
-
-function familyCost() {
-  let c = 0;
-  if (life.flags.married) c += 3000;
-  if (life.flags.kid && life.child.ageMonths >= 0 && life.child.ageMonths < 22 * 12) c += 8000;
-  return Math.round(c * costInflation());
-}
-
-function assetUpkeep() {
-  const a = life.assets || {};
-  const home = (life.homeLevel || 0) * 1500;
-  const car = (a.carTier || 0) * 800;
-  const rentals = (a.rentals || 0) * 3000;
-  return Math.round((home + car + rentals) * costInflation());
-}
-
-function rentalIncome() {
-  const a = life.assets || {};
-  let sum = 0;
-  for (let i = 0; i < (a.rentals || 0); i++) sum += RENTAL_INCOME[i] || 0;
-  return Math.round(sum * costInflation());
-}
-
-function childAgeYears() {
-  return life.child.ageMonths >= 0 ? Math.floor(life.child.ageMonths / 12) : -1;
-}
-
-function familyTick(months) {
-  const notes = [];
-  if (life.flags.kid && life.child.ageMonths >= 0) {
-    life.child.ageMonths += months;
-  }
-  if (life.parents.alive) {
-    const parentAge = ageYears() + 25;
-    if (parentAge >= 60) {
-      life.parents.health = clamp(life.parents.health - 0.2 * months, 0, 100);
-    }
-    if (life.parents.health <= 0) {
-      life.parents.alive = false;
-      life.parents.health = 0;
-      stats.heart = clamp(stats.heart - 15, 0, 100);
-      stats.money += 100000;
-      life.flags.inheritance = true;
-      notes.push('พ่อแม่จากไป — ได้รับมรดก ฿100,000');
-    }
-  }
-  return notes;
-}
-
-function livingCost() {
-  return Math.round(1800 * costInflation());
-}
-
-function taxPerMonth() {
-  const brackets = [[30000, 0.05], [60000, 0.08], [100000, 0.12], [Infinity, 0.17]];
-  let salary = finance.salary;
-  let prev = 0;
-  let tax = 0;
-  brackets.forEach(function (b) {
-    const part = Math.max(0, Math.min(salary, b[0]) - prev);
-    tax += part * b[1];
-    prev = b[0];
-  });
-  return Math.round(tax);
-}
-
-function socialSecurityPerMonth() {
-  if (finance.salary <= 0) return 0;
-  // ประกันสังคมลูกจ้าง 5% เพดานฐาน 15,000 บาท/เดือน
-  return Math.min(750, Math.round(finance.salary * 0.05));
-}
-
-function fixedPerMonth() {
-  return familyCost() + assetUpkeep();
-}
-
-function lifestyleCost() {
-  return Math.round(finance.salary * 0.12);
-}
-
-function billsTotalPerTurn() {
-  return Math.round((housingCost() + livingCost() + lifestyleCost()) * periodMonths());
-}
-
-function billsPaidThisTurn() {
-  return life.flags.billsPaidTurn === currentTurnKey();
-}
-
-function markBillsPaid(months) {
-  life.flags.billsPaidTurn = currentTurnKey();
-  life.flags.billsPaidMonths = Math.max(1, months || periodMonths());
-}
-
-function billsPaidMonthsThisTurn() {
-  return billsPaidThisTurn() ? (life.flags.billsPaidMonths || 0) : 0;
-}
-
-function passiveIncomePerMonth() {
-  let x = 0;
-  if (life.flags.condo) x += 3000;
-  if (life.flags.sideBiz) x += 2000;
-  if (life.business && life.business.active) x += life.business.monthly || 0;
-  x += rentalIncome();
-  return x;
-}
-
 function initDebtDue() {
   const key = currentTurnKey();
   Object.keys(debts).forEach(function (k) {
@@ -3193,24 +3104,11 @@ function resolveMonth(ev, monthsArg) {
   const warnings = [];
   if (fixedShortfall) warnings.push('เงินไม่พอจ่ายค่าครอบครัว/ทรัพย์สิน — ยอดขาด ฿' + fmt(fixedShortfall) + ' ทบเข้าบัตรเครดิต');
   // บิลที่จ่ายไปแล้วครอบคลุมเฉพาะเดือนที่จ่ายจริง — เดินเวลายาวต้องจ่ายส่วนที่เหลือ
-  const monthlyBills = housingCost() + livingCost() + lifestyleCost();
-  const paidMonths = billsPaidMonthsThisTurn();
-  const unpaidMonths = Math.max(0, months - paidMonths);
-  const bills = Math.round(monthlyBills * unpaidMonths);
-  let billsSettled = unpaidMonths <= 0;
-  if (unpaidMonths > 0) {
-    if (life.flags.autoBills && stats.money >= bills) {
-      stats.money -= bills;
-      markBillsPaid(unpaidMonths);
-      billsSettled = true;
-      debtNotes.push('บิลที่อยู่: หักอัตโนมัติ ฿' + fmt(bills));
-    } else {
-      debts.credit.balance += bills;
-      stats.credit = clamp(stats.credit - 3, 0, 100);
-      stats.heart = clamp(stats.heart - 2, 0, 100);
-      warnings.push('ค้างจ่ายบิลที่อยู่/ค่าครองชีพ ฿' + fmt(bills) + ' (' + unpaidMonths + ' เดือน) — ทบเข้าบัตรเครดิต');
-    }
-  }
+  const billRes = settleBillsAtMonthEnd(months);
+  const bills = billRes.amount;
+  const billsSettled = billRes.settled;
+  if (billRes.note) debtNotes.push(billRes.note);
+  if (billRes.warning) warnings.push(billRes.warning);
   familyNotes.forEach(function (n) { warnings.push(n); });
   let interestTotal = 0;
 
@@ -3471,68 +3369,18 @@ function afterTurnCommit(chapterChanged, months) {
   }
 }
 
-function openBills() {
-  if (paused) return;
-  const months = periodMonths();
-  const rent = housingCost() * months;
-  const utility = livingCost() * months;
-  const lifestyle = lifestyleCost() * months;
-  const total = rent + utility + lifestyle;
-  const paid = billsPaidThisTurn();
-  const html =
-    '<div class="ev-head"><span class="ev-chip">บิลที่อยู่</span><span>' + dateLabel() + '</span></div>' +
-    '<div class="ev-title">ค่าเช่า / ค่าครองชีพ</div>' +
-    '<div class="pay-table">' +
-    payRow('ค่าเช่า/ที่อยู่ (' + months + ' เดือน)', '฿' + fmt(rent), 'neg') +
-    payRow('ค่าน้ำค่าไฟ/ค่าครองชีพ', '฿' + fmt(utility), 'neg') +
-    payRow('ค่าใช้จ่ายตามรายได้ (12%)', '฿' + fmt(lifestyle), 'neg') +
-    '<div class="pay-total"><span>รวมบิลเทิร์นนี้</span><b>฿' + fmt(total) + '</b></div>' +
-    '</div>' +
-    '<div class="pay-debt">เงินสด <b>฿' + fmt(stats.money) + '</b> · ' +
-    (paid ? '<b style="color:#6ee7a8">จ่ายแล้วเทิร์นนี้</b>' : 'ยังไม่จ่าย — ถ้าปล่อยค้างจะทบเข้าบัตรเครดิต') +
-    '</div>' +
-    (!paid ? '<button class="btn-primary" id="billPayCash">จ่ายเงินสด ฿' + fmt(total) + '</button>' +
-      '<button class="btn-ghost" id="billPayCard">ผ่อนเข้าบัตรเครดิต</button>' : '') +
-    '<button class="btn-ghost" id="billAuto">' + (life.flags.autoBills ? 'ปิด' : 'เปิด') + 'หักบิลอัตโนมัติ</button>' +
-    '<button class="btn-ghost" id="billClose">ปิด</button>';
-  openModal(html);
-  document.getElementById('billClose').addEventListener('click', closeModal);
-  const cash = document.getElementById('billPayCash');
-  if (cash) {
-    cash.addEventListener('click', function () {
-      if (stats.money < total) { toast('เงินไม่พอจ่ายบิล ฿' + fmt(total)); return; }
-      stats.money -= total;
-      markBillsPaid(months);
-      saveGame();
-      closeModal();
-      updateHud();
-      toast('จ่ายบิลที่อยู่แล้ว ฿' + fmt(total));
-    });
-  }
-  const card = document.getElementById('billPayCard');
-  if (card) {
-    card.addEventListener('click', function () {
-      debts.credit.balance += total;
-      stats.credit = clamp(stats.credit - 3, 0, 100);
-      stats.heart = clamp(stats.heart - 2, 0, 100);
-      markBillsPaid(months);
-      saveGame();
-      closeModal();
-      updateHud();
-      toast('ผ่อนบิลเข้าบัตรเครดิต ฿' + fmt(total) + ' · เครดิต −3');
-    });
-  }
-  const autoBtn = document.getElementById('billAuto');
-  if (autoBtn) {
-    autoBtn.addEventListener('click', function () {
-      life.flags.autoBills = !life.flags.autoBills;
-      saveGame();
-      closeModal();
-      toast(life.flags.autoBills ? 'เปิดหักบิลอัตโนมัติแล้ว' : 'ปิดหักบิลอัตโนมัติแล้ว');
-      openBills();
-    });
-  }
-}
+// บิลที่อยู่: feature module (src/features/bills) — ตัวอย่างอ้างอิงของ architecture.md
+const billsFeature = createBills({
+  isPaused: function () { return paused; },
+  dateLabel: dateLabel,
+  openModal: openModal,
+  closeModal: closeModal,
+  toast: toast,
+  saveGame: saveGame,
+  updateHud: updateHud
+});
+
+function openBills() { billsFeature.open(); }
 
 function districtActivity(id) {
   if (paused) return;
@@ -4679,16 +4527,7 @@ const HOME_AH = HOME.h * ART;
 const STATION_AW = STATION.w * ART;
 const STATION_AH = STATION.h * ART;
 
-const P = {
-  grass: '#2a4b34', grassD: '#22402b', grassL: '#33593c', blade: '#3f6f4a',
-  flowerA: '#ffd75e', flowerB: '#ff8fb1', flowerC: '#c9d6ff',
-  dirt: '#59462f', dirtD: '#463622', dirtL: '#6b5539',
-  road: '#333a52', roadD: '#2a3044', roadL: '#3d4560', line: '#d8dfef',
-  walk: '#575f7d', walkD: '#4b526d', walkL: '#616a89', curb: '#7b85a8',
-  water: '#1d4d75', waterD: '#16405f', waterL: '#2b6791',
-  frame: '#141a30', winLit: '#ffe3a0', winLit2: '#ffcf7a', winOff: '#1b2440',
-  shadow: '#050817'
-};
+// palette กลาง P ย้ายไป src/render/palette.ts
 
 let cityStatic = null;
 let officeStatic = null;
@@ -4768,15 +4607,27 @@ function buildStatics() {
    ========================================================== */
 
 let districtStaticId = '';
+let districtNight = null;       // เลเยอร์ไฟกลางคืน (เฉพาะแผนที่เมืองแบบใหม่)
+let districtLights = [];        // แสงฟุ้ง {x,y,r,c,a} หน่วย art px
 let mapReturnPoints: any = {};
 let interiorSource = 'city';
 
 function buildDistrictStatic(spec: DistrictSpec) {
+  districtStaticId = spec.id;
+  if (spec.style) {
+    // แผนที่เมืองทุกจังหวัด → src/render/city-map-art.ts (มีเลเยอร์กลางวัน/กลางคืนแยก)
+    const art = buildCityMapArt(spec);
+    districtStatic = art.day;
+    districtNight = art.night;
+    districtLights = art.lights;
+    return;
+  }
+  districtNight = null;
+  districtLights = [];
   const prev = artStyleOverride;
   artStyleOverride = {};
   districtStatic = makeLayer(spec.w * ART, spec.h * ART, function () { buildDistrictArt(spec); });
   artStyleOverride = prev;
-  districtStaticId = spec.id;
 }
 
 function applyMapSpec(spec: DistrictSpec, placePlayer: boolean, mainMap: boolean, silent: boolean) {
@@ -5276,94 +5127,10 @@ function auditLayout() {
 /* ---------- district layout audit ---------- */
 
 function districtAudit() {
-  const issues: string[] = [];
   const spec = districtSpec || (life.activeDistrict ? getDistrictMap(life.activeDistrict) : null);
-  if (!spec) return issues;
-  const z = function (x: number, y: number) { return districtZone(spec, Math.floor(x), Math.floor(y)); };
-  const allowed: any = {
-    stall: ['sidewalk', 'green', 'sand'],
-    seafood: ['sidewalk', 'green'],
-    crate: ['sidewalk', 'green', 'sand'],
-    sign: ['sidewalk'],
-    lamp: ['sidewalk', 'green', 'sand'],
-    bin: ['sidewalk'],
-    bench: ['sidewalk', 'sand', 'green'],
-    power: ['sidewalk', 'green'],
-    dog: ['sidewalk', 'green', 'sand'],
-    fishnet: ['sand'],
-    crab: ['sand'],
-    palm: ['sand'],
-    boat: ['water'],
-    buoy: ['water'],
-    tank: ['green'],
-    truck: ['green'],
-    incense: ['green'],
-    lantern: ['green'],
-    barber: ['green', 'sidewalk'],
-    pier: ['sand', 'water']
-  };
-
-  spec.trees.forEach(function (t) {
-    const zone = z(t.x + 0.5, t.y + 0.5);
-    if (zone !== 'green' && zone !== 'mangrove') issues.push('tree @' + t.x + ',' + t.y + ' → ' + zone);
-    if (spec.grid[t.y][t.x] !== 1) issues.push('tree not blocking @' + t.x + ',' + t.y);
-  });
-
-  spec.mangroves.forEach(function (p) {
-    const zone = z(p.x, p.y);
-    if (zone !== 'mangrove' && zone !== 'green') issues.push('mangrove @' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ' → ' + zone);
-  });
-
-  spec.props.forEach(function (p) {
-    const list = allowed[p.type];
-    const zone = z(p.x, p.y);
-    if (list && list.indexOf(zone) === -1) {
-      issues.push(p.type + ' @' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ' → ' + zone);
-    }
-  });
-
-  spec.buildings.forEach(function (b) {
-    const zone = z(b.x + b.w / 2, b.y + b.h / 2);
-    if (zone !== 'building') issues.push('building ' + b.id + ' → ' + zone);
-    for (let ty = b.y; ty < b.y + b.h; ty++) {
-      for (let tx = b.x; tx < b.x + b.w; tx++) {
-        if (spec.grid[ty][tx] !== 1) issues.push('building not blocking ' + b.id + ' @' + tx + ',' + ty);
-      }
-    }
-  });
-
-  spec.houses.forEach(function (b) {
-    const zone = z(b.x + b.w / 2, b.y + b.h / 2);
-    if (zone !== 'building') issues.push('house → ' + zone + ' @' + b.x + ',' + b.y);
-  });
-
-  // น้ำต้องบล็อก เว้นสะพาน/ท่าเรือ
-  spec.water.forEach(function (w) {
-    for (let ty = w.y; ty < w.y + w.h; ty++) {
-      for (let tx = w.x; tx < w.x + w.w; tx++) {
-        const isRoad = spec.roads.some(function (r) {
-          return tx >= r.x && tx < r.x + r.w && ty >= r.y && ty < r.y + r.h;
-        });
-        const isPier = spec.pier && tx >= spec.pier.x && tx < spec.pier.x + spec.pier.w && ty >= spec.pier.y && ty < spec.pier.y + spec.pier.h;
-        if (!isRoad && !isPier && spec.grid[ty][tx] !== 1) issues.push('water not blocking @' + tx + ',' + ty);
-      }
-    }
-  });
-
-  spec.hotspots.forEach(function (h) {
-    const zone = z(h.x, h.y);
-    if (zone === 'water' || zone === 'building' || zone === 'edge') {
-      issues.push('hotspot ' + h.id + ' → ' + zone);
-    }
-    const tx = Math.floor(h.x);
-    const ty = Math.floor(h.y);
-    if (spec.grid[ty] && spec.grid[ty][tx] === 1) issues.push('hotspot blocked ' + h.id + ' @' + tx + ',' + ty);
-  });
-
-  const sx = Math.floor(spec.spawn.x);
-  const sy = Math.floor(spec.spawn.y);
-  if (!spec.grid[sy] || spec.grid[sy][sx] === 1) issues.push('spawn blocked');
-
+  if (!spec) return [];
+  // ตรรกะอยู่ใน src/map-audit.ts (pure — unit test เรียกใช้ได้)
+  const issues = auditDistrictSpec(spec);
   if (issues.length) console.warn('[OpenLife] district issues:', spec.id, issues);
   else console.info('[OpenLife] district audit: OK (' + spec.id + ' ' + spec.w + '×' + spec.h + ')');
   return issues;
@@ -7416,7 +7183,8 @@ function buildHotspotLabels() {
   const wrap = document.getElementById('hotspotLabels');
   if (!wrap) return;
   const list = hotspots();
-  const key = scene + ':' + list.length;
+  // ใส่ id แผนที่ด้วย — ไม่งั้นย้ายไปแผนที่ใหม่ที่จำนวน hotspot เท่ากันจะใช้ป้ายของแผนที่เก่าค้าง
+  const key = scene + ':' + (scene === 'district' && districtSpec ? districtSpec.id : '') + ':' + list.length;
   if (key === hotspotLabelKey) return;
   hotspotLabelKey = key;
   wrap.innerHTML = '';
@@ -8736,8 +8504,17 @@ function drawLighting() {
   if (scene === 'district' && l[1] > 0.12 && districtSpec) {
     const offX = -Math.round(cam.x / W2A);
     const offY = -Math.round(cam.y / W2A);
+    // หน้าต่าง/ป้าย/ร้านเรืองแสง วางทับหลัง tint (กลางวันไม่แสดง)
+    if (districtNight) {
+      ctx.globalAlpha = clamp((l[1] - 0.08) / 0.5, 0, 1);
+      ctx.drawImage(districtNight, offX, offY);
+      ctx.globalAlpha = 1;
+    }
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
+    districtLights.forEach(function (g) {
+      drawLightBlob(g.x + offX, g.y + offY, g.r, g.c, g.a * l[1] / 0.62);
+    });
     districtSpec.props.forEach(function (p) {
       const lx = p.x * ART + offX;
       const ly = p.y * ART + offY;
@@ -8749,7 +8526,7 @@ function drawLighting() {
       else if (p.type === 'lantern') drawLightBlob(lx, ly - 4, 22, '#ff5c6c', 0.32 * l[1]);
       else if (p.type === 'incense') drawLightBlob(lx, ly - 6, 18, '#ffd75e', 0.22 * l[1]);
     });
-    districtSpec.buildings.forEach(function (b) {
+    if (!districtSpec.style) districtSpec.buildings.forEach(function (b) {
       const bx = (b.x + b.w / 2) * ART + offX;
       const by = (b.y + b.h) * ART + offY;
       if (b.id === 'temple') drawLightBlob(bx, by - 10, 50, '#ffcf5e', 0.34 * l[1]);
@@ -9034,11 +8811,15 @@ if (scene === 'shop') {
 buildStatics();
 buildMapLabels();
 layoutMapLabels(scene === 'city' && viewMode === 'map');
-window.__layoutAudit = auditLayout;
-window.__districtAudit = districtAudit;
-window.__appearanceAudit = function () { return Look.appearanceAudit(life.appearance); };
+// debug hooks เปิดเฉพาะ dev server หรือ URL ?debug=1 (B-005) — e2e ใส่ debug=1 เอง (code.md §8)
+const DEBUG_HOOKS = import.meta.env.DEV || /[?&]debug=1(&|$)/.test(location.search);
 const GEO_ZONES = DISTRICTS.map(function (d) { return d.id; });
-window.__geoAudit = function () { return geoAudit(GEO_ZONES); };
+if (DEBUG_HOOKS) {
+  window.__layoutAudit = auditLayout;
+  window.__districtAudit = districtAudit;
+  window.__appearanceAudit = function () { return Look.appearanceAudit(life.appearance); };
+  window.__geoAudit = function () { return geoAudit(GEO_ZONES); };
+}
 auditLayout();
 if (districtSpec) districtAudit();
 if (geoAudit(GEO_ZONES).length) console.warn('[OpenLife] geo issues:', geoAudit(GEO_ZONES));
@@ -9168,7 +8949,6 @@ document.addEventListener('visibilitychange', function () {
 
 let last = 0;
 let lastFrame = 0;
-let pausedRendered = false;
 function loop(ts) {
   requestAnimationFrame(loop);
   if (ts - lastFrame < 15) return;
@@ -9208,8 +8988,9 @@ normalizeEventOps(SEASON_EVENTS);
 normalizeEventOps(DISTRICT_EVENTS);
 
 /* ---------- debug ---------- */
-window.__ol = {
+if (DEBUG_HOOKS) window.__ol = {
   stats: stats,
+  profile: profile,
   world: world,
   player: player,
   flags: flags,

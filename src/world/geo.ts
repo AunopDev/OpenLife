@@ -1,6 +1,8 @@
 /* OpenLife — geographic hierarchy: province → district (เขต/อำเภอ) → neighborhood (ย่าน)
    RESEARCH: docs/research/geo-hierarchy.md */
-import geoData from './data/geo.json';
+import geoData from '../data/geo.json';
+import provincesList from '../data/provinces.json';
+import type { CityArchetype, CityRegion, WatStyle } from './district-maps';
 
 export interface GeoNeighborhood {
   id: string;
@@ -13,10 +15,36 @@ export interface GeoNeighborhood {
   mapId?: string;
 }
 
+/** ค่าตั้งแผนที่ระดับจังหวัด — บังคับทุกจังหวัด (tests/unit/geo-config.test.ts) · กฎ: docs/rules/maps.md §2 */
+export interface ProvinceMapConfig {
+  /** ชุดสีพื้น/หลังคาตามภาค (key ใน PALETTES ของ city-maps.ts) */
+  palette: 'bangkok' | 'central' | 'north' | 'isan' | 'east' | 'south';
+  region: CityRegion;
+  /** แหล่งน้ำในเมืองสำหรับอำเภอที่ไม่ติดทะเล */
+  inlandWater: 'canal' | 'pond';
+  /** โครงถนน: grid = ครบ 4 เส้น · no-* = ตัดเส้นนั้นออก · seeded = สุ่มตาม seed ของพื้นที่ */
+  roadLayout: 'grid' | 'no-east' | 'no-west' | 'no-east-west' | 'no-south' | 'seeded';
+}
+
+export interface LandmarkConfig { name: string; roof: string; sign: string; }
+
+/** ค่าตั้งแผนที่ระดับเขต/อำเภอ — บังคับทุกเขต ห้ามปล่อยให้ใช้ค่าเริ่มต้นโดยไม่ตั้งใจ */
+export interface DistrictMapConfig {
+  archetype: CityArchetype;
+  coastal: boolean;
+  wat: WatStyle;
+  landmark: LandmarkConfig;
+  /** สีหลังคาหลักเฉพาะถิ่น (เช่น ย่านจีน) — ไม่ใส่ = ใช้สีจาก palette */
+  roof?: string;
+  /** สีหลังคาบ้านรองเฉพาะถิ่น */
+  houseRoof?: string;
+}
+
 export interface GeoDistrict {
   id: string;
   name: string;
   vibe: string;
+  map: DistrictMapConfig;
   neighborhoods: GeoNeighborhood[];
 }
 
@@ -27,6 +55,7 @@ export interface GeoProvince {
   region: string;
   salary: number;
   rent: number;
+  map: ProvinceMapConfig;
   districts: GeoDistrict[];
 }
 
@@ -131,8 +160,12 @@ export function geoAudit(validZones: string[]): string[] {
       });
     });
   });
-  ['กรุงเทพฯ', 'นนทบุรี', 'ปทุมธานี', 'สมุทรปราการ', 'เชียงใหม่', 'ขอนแก่น', 'ชลบุรี', 'สงขลา'].forEach(function (name) {
-    if (!geoProvince(name)) issues.push('ขาดจังหวัด: ' + name);
+  // รายชื่อจังหวัดในเมนู (provinces.json) ต้องตรงกับ geo.json ทั้งสองทาง
+  (provincesList as string[]).forEach(function (name) {
+    if (!geoProvince(name)) issues.push('ขาดจังหวัดใน geo.json: ' + name);
+  });
+  GEO.forEach(function (p) {
+    if ((provincesList as string[]).indexOf(p.name) === -1) issues.push('จังหวัดไม่อยู่ใน provinces.json (ไม่โผล่ในเมนู): ' + p.name);
   });
   return issues;
 }

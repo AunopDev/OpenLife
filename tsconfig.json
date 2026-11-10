@@ -9,7 +9,19 @@
     "allowJs": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"]
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client"
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "tests",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
 }
