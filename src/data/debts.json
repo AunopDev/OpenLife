@@ -1,0 +1,54 @@
+{
+  "credit": {
+    "label": "บัตรเครดิต",
+    "balance": 15000,
+    "rate": 0.025,
+    "min": 1500,
+    "dueDay": 25,
+    "missed": 0,
+    "lastPaidKey": null,
+    "repossessed": false,
+    "collector": false,
+    "lawsuit": false,
+    "grace": false
+  },
+  "car": {
+    "label": "ผ่อนรถ",
+    "balance": 180000,
+    "rate": 0.006,
+    "min": 6500,
+    "dueDay": 5,
+    "missed": 0,
+    "lastPaidKey": null,
+    "repossessed": false,
+    "collector": false,
+    "lawsuit": false,
+    "grace": false
+  },
+  "student": {
+    "label": "กยศ.",
+    "balance": 120000,
+    "rate": 0.01,
+    "min": 1200,
+    "dueDay": 15,
+    "missed": 0,
+    "lastPaidKey": null,
+    "repossessed": false,
+    "collector": false,
+    "lawsuit": false,
+    "grace": false
+  },
+  "personal": {
+    "label": "สินเชื่อส่วนบุคคล",
+    "balance": 0,
+    "rate": 0.015,
+    "min": 2500,
+    "dueDay": 20,
+    "missed": 0,
+    "lastPaidKey": null,
+    "repossessed": false,
+    "collector": false,
+    "lawsuit": false,
+    "grace": false
+  }
+}

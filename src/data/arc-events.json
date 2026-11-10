@@ -1,0 +1,273 @@
+{
+  "5": [
+    {
+      "title": "นนท์ชวนลงทุน",
+      "text": "นนท์เพื่อนสนิทโทรมาหาเสียงตื่นเต้น — “กูจะเปิดร้านออนไลน์ ว่างเมื่อไหร่มาช่วยดูหน่อยดิ” เขาขอให้คุณลงเงินหรือให้ยืมเพื่อเริ่มต้น",
+      "requires": { "noFlag": "friendArc1", "minAge": 22 },
+      "choices": [
+        {
+          "label": "ลงทุน 50,000 ในร้านของนนท์",
+          "fx": { "money": -50000, "rel": { "friend": 8 }, "flags": { "friendArc1": true, "friendInvest": true } },
+          "hint": [["down", "เงิน −50,000"], ["up", "เพื่อน +8"]]
+        },
+        {
+          "label": "ให้ยืม 20,000 พอช่วยได้",
+          "fx": { "money": -20000, "rel": { "friend": 6 }, "flags": { "friendArc1": true, "friendLoan": true } },
+          "hint": [["down", "เงิน −20,000"], ["up", "เพื่อน +6"]]
+        },
+        {
+          "label": "ปฏิเสธ — ยังไม่มั่นใจ",
+          "fx": { "rel": { "friend": -5 }, "flags": { "friendArc1": true, "friendDecline": true } },
+          "hint": [["down", "เพื่อน −5"]]
+        }
+      ]
+    },
+    {
+      "title": "คนรู้ใจ",
+      "text": "มีคนหนึ่งที่คุณคุยด้วยแล้วรู้สึกว่าวันทั้งวันดีขึ้น — เขาชวนไปกินข้าวเย็นหลังเลิกงาน",
+      "requires": { "noFlag": "loveArc1", "maxRel": { "love": 5 }, "minAge": 22 },
+      "choices": [
+        {
+          "label": "ชวนคุยต่อจนดึก",
+          "fx": { "heart": 4, "rel": { "love": 8 }, "flags": { "loveArc1": true } },
+          "hint": [["up", "ใจ +4"], ["up", "ความรัก +8"]]
+        },
+        {
+          "label": "ปล่อยผ่าน — ยังไม่พร้อม",
+          "fx": { "heart": -1, "flags": { "loveArc1": true } }
+        }
+      ]
+    }
+  ],
+  "6": [
+    {
+      "title": "ร้านของนนท์ไปได้ดี",
+      "text": "นนท์ส่งข้อความมาพร้อมรูปยอดขาย — ร้านที่คุณลงทุนไว้เริ่มมีกำไร เขาอยากแบ่งส่วนแบ่งให้คุณ",
+      "requires": { "flag": "friendInvest", "noFlag": "friendArc2", "minAge": 27 },
+      "choices": [
+        {
+          "label": "รับส่วนแบ่ง 80,000",
+          "fx": { "money": 80000, "heart": 4, "rel": { "friend": 6 }, "flags": { "friendArc2": true } },
+          "hint": [["up", "เงิน +80,000"], ["up", "เพื่อน +6"]]
+        },
+        {
+          "label": "ให้เอาไปลงต่อ",
+          "fx": { "money": 30000, "rel": { "friend": 10 }, "flags": { "friendArc2": true, "friendPartner": true } },
+          "hint": [["up", "เงิน +30,000"], ["up", "เพื่อน +10"]]
+        }
+      ]
+    },
+    {
+      "title": "นนท์คืนเงินพร้อมดอกเบี้ย",
+      "text": "นนท์โอนเงินคืนพร้อมคำขอบคุณ — “ขอบใจที่เชื่อกูตอนที่กูยังไม่มีอะไรเลย”",
+      "requires": { "flag": "friendLoan", "noFlag": "friendArc2", "minAge": 27 },
+      "choices": [
+        {
+          "label": "รับเงินคืน 22,000",
+          "fx": { "money": 22000, "heart": 2, "rel": { "friend": 5 }, "flags": { "friendArc2": true } }
+        }
+      ]
+    },
+    {
+      "title": "นนท์เริ่มห่างหาย",
+      "text": "นนท์ไม่ค่อยตอบข้อความ และไม่ชวนออกไปไหนเหมือนเดิม — ดูเหมือนคำปฏิเสธครั้งนั้นยังค้างอยู่ในใจเขา",
+      "requires": { "flag": "friendDecline", "noFlag": "friendArc2", "minAge": 27 },
+      "choices": [
+        {
+          "label": "ปล่อยให้เวลาช่วยเยียวยา",
+          "fx": { "heart": -2, "rel": { "friend": -4 }, "flags": { "friendArc2": true } }
+        },
+        {
+          "label": "ขอโทษและชวนกินข้าว",
+          "fx": { "heart": 2, "rel": { "friend": 3 }, "flags": { "friendArc2": true } }
+        }
+      ]
+    },
+    {
+      "title": "หัวหน้าขอให้แบกงาน",
+      "text": "หัวหน้าเรียกคุณเข้าห้องประชุม — “โปรเจกต์นี้พี่ฝากเธอเลยนะ” แต่งานประจำก็ยังเต็มมือ",
+      "requires": { "noFlag": "bossArc1", "minSalary": 15000, "minAge": 27 },
+      "choices": [
+        {
+          "label": "รับงานเพิ่ม",
+          "fx": { "kpi": 8, "energy": -6, "heart": -4, "rel": { "boss": 6 }, "flags": { "bossArc1": true } },
+          "hint": [["up", "ผลงาน +8"], ["down", "ใจ −4"]]
+        },
+        {
+          "label": "ต่อรองขอทีมช่วย",
+          "fx": { "kpi": 4, "social": 4, "rel": { "boss": 2 }, "flags": { "bossArc1": true } }
+        },
+        {
+          "label": "ปฏิเสธอย่างสุภาพ",
+          "fx": { "heart": 3, "rel": { "boss": -4 }, "flags": { "bossArc1": true } }
+        }
+      ]
+    },
+    {
+      "title": "สารภาพรัก",
+      "text": "คุณกับคนรู้ใจสนิทกันมากขึ้นเรื่อย ๆ — คืนนี้เขาถามตรง ๆ ว่า “เราคืออะไรกัน?”",
+      "requires": { "flag": "loveArc1", "noFlag": "loveArc2", "minRel": { "love": 25 }, "minAge": 27 },
+      "choices": [
+        {
+          "label": "สารภาพรัก",
+          "fx": { "heart": 6, "rel": { "love": 10 }, "flags": { "loveArc2": true } },
+          "hint": [["up", "ใจ +6"], ["up", "ความรัก +10"]]
+        },
+        {
+          "label": "ขอเวลาทำความเข้าใจตัวเอง",
+          "fx": { "heart": 1, "rel": { "love": 2 }, "flags": { "loveArc2": true, "loveWait": true } }
+        },
+        {
+          "label": "ถอยออกมา",
+          "fx": { "heart": -2, "rel": { "love": -6 }, "flags": { "loveArc2": true } }
+        }
+      ]
+    }
+  ],
+  "7": [
+    {
+      "title": "งานแต่งของนนท์",
+      "text": "นนท์ส่งการ์ดงานแต่งมาเป็นคนแรก — “มึงต้องมานะ” เขาเขียนไว้ท้ายการ์ด",
+      "requires": { "flag": "friendArc2", "noFlag": "friendArc3", "minAge": 35 },
+      "choices": [
+        {
+          "label": "เป็นสักขีพยานให้เขา",
+          "fx": { "money": -10000, "heart": 6, "rel": { "friend": 12 }, "flags": { "friendArc3": true } },
+          "hint": [["down", "เงิน −10,000"], ["up", "เพื่อน +12"]]
+        },
+        {
+          "label": "ไปงานแต่ไม่รับบทบาท",
+          "fx": { "money": -5000, "heart": 3, "rel": { "friend": 6 }, "flags": { "friendArc3": true } }
+        },
+        {
+          "label": "ติดงาน ไม่ได้ไป",
+          "fx": { "heart": -3, "rel": { "friend": -10 }, "flags": { "friendArc3": true } }
+        }
+      ]
+    },
+    {
+      "title": "ชิงตำแหน่งหัวหน้าทีม",
+      "text": "บริษัทเปิดตำแหน่งหัวหน้าทีมใหม่ — คุณคือหนึ่งในสองคนที่มีสิทธิ์ และอีกคนคือคนที่คุณทำงานด้วยทุกวัน",
+      "requires": { "flag": "bossArc1", "noFlag": "bossArc2", "minAge": 35 },
+      "choices": [
+        {
+          "label": "นำโปรเจกต์เอง",
+          "fx": { "kpi": 10, "energy": -8, "heart": -3, "rel": { "boss": 5 }, "flags": { "bossArc2": true } },
+          "hint": [["up", "ผลงาน +10"], ["down", "ใจ −3"]]
+        },
+        {
+          "label": "ผลักคู่แข่งออกจากโปรเจกต์",
+          "fx": { "kpi": 6, "social": -6, "rel": { "boss": 3 }, "flags": { "bossArc2": true } },
+          "hint": [["up", "ผลงาน +6"], ["down", "มนุษย์ −6"]]
+        },
+        {
+          "label": "ปล่อยโอกาสให้คนอื่น",
+          "fx": { "heart": 4, "kpi": -2, "rel": { "friend": 2 }, "flags": { "bossArc2": true } }
+        }
+      ]
+    },
+    {
+      "title": "ขอแต่งงาน",
+      "text": "คุณกับคนรักใช้เวลาด้วยกันมานานพอที่จะรู้ใจกัน — คำถามต่อไปอาจเปลี่ยนชีวิตทั้งชีวิต",
+      "requires": { "flag": "loveArc2", "noFlag": "married", "minRel": { "love": 45 }, "minAge": 35 },
+      "choices": [
+        {
+          "label": "ขอแต่งงาน",
+          "fx": { "money": -100000, "heart": 10, "rel": { "love": 10 }, "flags": { "married": true, "loveArc3": true } },
+          "hint": [["down", "เงิน −100,000"], ["up", "ใจ +10"], ["up", "แต่งงาน"]]
+        },
+        {
+          "label": "อยู่ด้วยกันก่อน",
+          "fx": { "heart": 5, "rel": { "love": 6 }, "flags": { "cohabit": true, "loveArc3": true } }
+        },
+        {
+          "label": "รออีกหน่อย",
+          "fx": { "heart": -1, "rel": { "love": -2 }, "flags": { "loveArc3": true } }
+        }
+      ]
+    }
+  ],
+  "8": [
+    {
+      "title": "นนท์ตกงาน",
+      "text": "นนท์โทรมาเสียงสั่น — บริษัทปิดสาขา เขาเพิ่งถูกเลิกจ้าง และยังมีค่าเช่าบ้านที่ต้องจ่าย",
+      "requires": { "flag": "friendArc3", "noFlag": "friendArc4", "minAge": 45 },
+      "choices": [
+        {
+          "label": "ให้เขาพักที่บ้าน",
+          "fx": { "money": -5000, "heart": 4, "rel": { "friend": 10 }, "flags": { "friendArc4": true } },
+          "hint": [["up", "เพื่อน +10"], ["down", "เงิน −5,000"]]
+        },
+        {
+          "label": "ให้ยืม 30,000",
+          "fx": { "money": -30000, "rel": { "friend": 8 }, "flags": { "friendArc4": true } }
+        },
+        {
+          "label": "ปฏิเสธ — ชีวิตใครชีวิตมัน",
+          "fx": { "heart": -2, "rel": { "friend": -12 }, "flags": { "friendArc4": true } }
+        }
+      ]
+    },
+    {
+      "title": "หัวหน้าเสนอตำแหน่งผู้จัดการ",
+      "text": "หัวหน้าเรียกคุณไปคุยส่วนตัว — “พี่จะเกษียณปีหน้า อยากให้เธอขึ้นมาแทน” ตำแหน่งมาพร้อมเงินเดือนและความรับผิดชอบที่มากกว่าเดิม",
+      "requires": { "flag": "bossArc2", "noFlag": "bossArc3", "minAge": 45 },
+      "choices": [
+        {
+          "label": "รับตำแหน่ง",
+          "fx": { "kpi": 6, "social": 4, "energy": -6, "rel": { "boss": 6 }, "flags": { "bossArc3": true } },
+          "hint": [["up", "ผลงาน +6"], ["up", "หัวหน้า +6"]]
+        },
+        {
+          "label": "ขอเวลาตัดสินใจ",
+          "fx": { "heart": 3, "rel": { "boss": -2 }, "flags": { "bossArc3": true } }
+        },
+        {
+          "label": "ปฏิเสธ — ขอโฟกัสชีวิต",
+          "fx": { "heart": 6, "rel": { "boss": -6 }, "flags": { "bossArc3": true } }
+        }
+      ]
+    },
+    {
+      "title": "ชีวิตคู่หลังแต่งงาน",
+      "text": "หลังแต่งงาน ชีวิตประจำวันเปลี่ยนไป — งาน บ้าน และความฝันส่วนตัวเริ่มแย่งเวลากัน",
+      "requires": { "flag": "married", "noFlag": "loveArc4", "minAge": 45 },
+      "choices": [
+        {
+          "label": "วางแผนครอบครัวด้วยกัน",
+          "fx": { "heart": 5, "rel": { "love": 6 }, "flags": { "loveArc4": true } }
+        },
+        {
+          "label": "โฟกัสงานก่อน",
+          "fx": { "kpi": 4, "heart": -2, "rel": { "love": -4 }, "flags": { "loveArc4": true } }
+        },
+        {
+          "label": "นั่งคุยปรับความเข้าใจ",
+          "fx": { "heart": 2, "rel": { "love": 3 }, "flags": { "loveArc4": true } }
+        }
+      ]
+    }
+  ],
+  "9": [
+    {
+      "title": "วิกฤตบริษัท",
+      "text": "บริษัทประกาศลดต้นทุนครั้งใหญ่ — หัวหน้าเรียกคุณไปคุยว่า “ถ้าเธออยู่ ช่วยพาทีมฝ่าวิกฤตนี้ไปด้วยกันนะ”",
+      "requires": { "flag": "bossArc3", "noFlag": "bossArc4", "minAge": 55 },
+      "choices": [
+        {
+          "label": "อยู่ช่วยบริษัท",
+          "fx": { "kpi": 8, "health": -4, "rel": { "boss": 8 }, "flags": { "bossArc4": true } },
+          "hint": [["up", "ผลงาน +8"], ["down", "สุขภาพ −4"]]
+        },
+        {
+          "label": "ย้ายไปบริษัทใหม่",
+          "fx": { "money": 50000, "kpi": -4, "social": 3, "flags": { "bossArc4": true } }
+        },
+        {
+          "label": "ลาออกไปทำธุรกิจเอง",
+          "fx": { "money": -50000, "heart": 6, "flags": { "bossArc4": true, "sideBiz": true } }
+        }
+      ]
+    }
+  ]
+}

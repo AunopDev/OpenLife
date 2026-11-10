@@ -1,0 +1,285 @@
+[
+  {
+    "id": "samyan",
+    "name": "สามย่าน",
+    "rect": [
+      0,
+      0,
+      12,
+      10
+    ],
+    "label": [
+      6.2,
+      5.2
+    ],
+    "spot": [
+      8,
+      7
+    ],
+    "accent": "#d9a441",
+    "roof": "#7a4a3a",
+    "roofDark": "#553227",
+    "sign": "#b4682f",
+    "vibe": "นักศึกษา หนังสือพิมพ์ ร้านหนังสือเก่า",
+    "activity": "ร้านหนังสือสามย่าน",
+    "activityText": "ร้านหนังสือเก่าในสามย่านมีกลิ่นกระดาษและชั้นหนังสือสูงท่วมหัว",
+    "activityFx": {
+      "money": -150,
+      "smarts": 2,
+      "energy": -1
+    },
+    "nightActivity": "อ่านหนังสือดึกที่สามย่าน",
+    "nightFx": {
+      "smarts": 3,
+      "energy": -4
+    }
+  },
+  {
+    "id": "silom",
+    "name": "สีลม",
+    "rect": [
+      14,
+      0,
+      16,
+      10
+    ],
+    "label": [
+      20.5,
+      5.4
+    ],
+    "spot": [
+      22,
+      7
+    ],
+    "accent": "#4f7fd6",
+    "roof": "#39477e",
+    "roofDark": "#28325c",
+    "sign": "#2f4bb0",
+    "vibe": "ออฟฟิศ เงินเดือน สกายวอล์ก",
+    "activity": "คาเฟ่ริมสกายวอล์ก",
+    "activityText": "คาเฟ่เล็ก ๆ ริมสกายวอล์กสีลม มองลงไปเห็นรถติดยาวเป็นหาง",
+    "activityFx": {
+      "money": -100,
+      "social": 2,
+      "energy": 2
+    },
+    "nightActivity": "บาร์หลังเลิกงานสีลม",
+    "nightFx": {
+      "money": -700,
+      "social": 5,
+      "health": -1,
+      "heart": 3
+    }
+  },
+  {
+    "id": "chula",
+    "name": "จุฬาฯ",
+    "rect": [
+      32,
+      0,
+      8,
+      10
+    ],
+    "label": [
+      35.2,
+      5.2
+    ],
+    "spot": [
+      35,
+      7
+    ],
+    "accent": "#d98aa8",
+    "roof": "#8a4a5a",
+    "roofDark": "#5e2f3d",
+    "sign": "#a13a52",
+    "vibe": "มหาวิทยาลัย หอสมุด งานวิชาการ",
+    "activity": "หอสมุดจุฬาฯ",
+    "activityText": "หอสมุดเงียบจนได้ยินเสียงพลิกหนังสือ และมีโต๊ะว่างริมหน้าต่าง",
+    "activityFx": {
+      "smarts": 3,
+      "energy": -3
+    },
+    "nightActivity": "หอสมุดรอบดึกจุฬาฯ",
+    "nightFx": {
+      "smarts": 3,
+      "energy": -3
+    }
+  },
+  {
+    "id": "bangrak",
+    "name": "บางรัก",
+    "rect": [
+      0,
+      10,
+      12,
+      10
+    ],
+    "label": [
+      5.4,
+      16.6
+    ],
+    "spot": [
+      9,
+      10
+    ],
+    "accent": "#d9873f",
+    "roof": "#7a5240",
+    "roofDark": "#553327",
+    "sign": "#8a5f47",
+    "vibe": "บ้านเก่า ริมน้ำ ตลาดเช้า",
+    "activity": "เดินเลียบแม่น้ำบางรัก",
+    "activityText": "ทางเดินริมแม่น้ำบางรักลมโชย เรือสินค้าแล่นผ่านช้า ๆ",
+    "activityFx": {
+      "heart": 4,
+      "energy": -2
+    },
+    "nightActivity": "เดินริมน้ำบางรักยามค่ำ",
+    "nightFx": {
+      "heart": 4,
+      "energy": -2
+    }
+  },
+  {
+    "id": "pathumwan",
+    "name": "ปทุมวัน",
+    "rect": [
+      14,
+      10,
+      16,
+      10
+    ],
+    "label": [
+      22.4,
+      16.4
+    ],
+    "spot": [
+      22,
+      19
+    ],
+    "accent": "#b06fd6",
+    "roof": "#4b3a6e",
+    "roofDark": "#33264c",
+    "sign": "#6b4fb0",
+    "vibe": "ห้างสรรพสินค้า แฟชั่น ภาพยนตร์",
+    "activity": "เดินห้างปทุมวัน",
+    "activityText": "ห้างปทุมวันเต็มไปด้วยป้ายลดราคาและกลิ่นป็อปคอร์นจากโรงหนัง",
+    "activityFx": {
+      "money": -300,
+      "heart": 3,
+      "social": 1
+    },
+    "nightActivity": "หนังรอบดึกปทุมวัน",
+    "nightFx": {
+      "money": -350,
+      "heart": 5
+    }
+  },
+  {
+    "id": "lumphini",
+    "name": "สวนลุมพินี",
+    "rect": [
+      0,
+      20,
+      12,
+      8
+    ],
+    "label": [
+      5.6,
+      23.4
+    ],
+    "spot": [
+      6,
+      24
+    ],
+    "accent": "#5fae6a",
+    "roof": "#4f7a52",
+    "roofDark": "#355437",
+    "sign": "#3f8a4c",
+    "vibe": "สวนสาธารณะ วิ่งออกกำลังกาย",
+    "activity": "วิ่งรอบสวนลุม",
+    "activityText": "สวนลุมพินีตอนเช้ามีคนวิ่งและเต้นแอโรบิกเป็นกลุ่มใหญ่",
+    "activityFx": {
+      "health": 3,
+      "heart": 2,
+      "energy": -4
+    },
+    "nightActivity": "เดินเล่นสวนลุมยามค่ำ",
+    "nightFx": {
+      "health": 1,
+      "heart": 3,
+      "energy": -2
+    }
+  },
+  {
+    "id": "yaowarat",
+    "name": "เยาวราช",
+    "rect": [
+      14,
+      20,
+      16,
+      8
+    ],
+    "label": [
+      21.8,
+      24.2
+    ],
+    "spot": [
+      24,
+      22
+    ],
+    "accent": "#d64b4b",
+    "roof": "#6e3a3e",
+    "roofDark": "#4c262a",
+    "sign": "#b04148",
+    "vibe": "ตลาดกลางคืน อาหารจีน ทองคำ",
+    "activity": "กินสตรีทฟู้ดเยาวราช",
+    "activityText": "กลิ่นเตาถ่านและซุปร้อนลอยเต็มเยาวราช ร้านแต่ละร้านมีคิว",
+    "activityFx": {
+      "money": -120,
+      "heart": 3,
+      "energy": 6
+    },
+    "nightActivity": "ตลาดกลางคืนเยาวราช",
+    "nightFx": {
+      "money": -220,
+      "heart": 4,
+      "energy": 4
+    }
+  },
+  {
+    "id": "khlongtoei",
+    "name": "คลองเตย",
+    "rect": [
+      32,
+      10,
+      8,
+      18
+    ],
+    "label": [
+      36.2,
+      17.4
+    ],
+    "spot": [
+      36,
+      19
+    ],
+    "accent": "#4f9a8a",
+    "roof": "#4b5a6e",
+    "roofDark": "#333f52",
+    "sign": "#4f8a9a",
+    "vibe": "ชุมชนท่าเรือ โรงงาน กลิ่นน้ำมัน",
+    "activity": "เดินตลาดคลองเตย",
+    "activityText": "ตลาดคลองเตยคึกคักด้วยของทะเลและคนทำงานกะเช้า",
+    "activityFx": {
+      "money": -80,
+      "health": 2,
+      "heart": 1
+    },
+    "nightActivity": "กะกลางคืนท่าเรือคลองเตย",
+    "nightFx": {
+      "money": 900,
+      "health": -3,
+      "energy": -5
+    }
+  }
+]

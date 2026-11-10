@@ -13,20 +13,27 @@
 <div id="stage">
   <canvas id="game" width="1440" height="900"></canvas>
 
-  <div class="panel char-mini">
+  <div class="panel char-card">
     <canvas id="portrait" width="24" height="24"></canvas>
-    <div class="cm-info">
-      <div class="cm-name">สมชาย ใจดี</div>
-      <div class="cm-role">พนักงานเงินเดือน · เด็กใหม่</div>
+    <div class="char-info">
+      <div class="cm-name" id="charName">สมชาย ใจดี</div>
+      <div class="cm-role" id="charRole">พนักงานเงินเดือน · เด็กใหม่</div>
+    </div>
+    <div class="clock">
+      <div class="clk" id="clockTime">07:30</div>
+      <div class="clk-date" id="clockDate">จ. 1 ม.ค. 2569</div>
+      <div class="clk-payday" id="paydayText">เงินเดือนออกอีก 24 วัน</div>
+      <div class="clk-age" id="ageText">อายุ 22 · สร้างตัว</div>
     </div>
   </div>
 
   <div class="panel stat-panel" id="statPanel"></div>
 
-  <div class="panel clock-panel">
-    <div class="clk" id="clockTime">07:30</div>
-    <div class="clk-date" id="clockDate">จ. 1 ม.ค. 2569</div>
-    <div class="dayprog"><i id="dayProg"></i></div>
+  <div class="panel ticker">
+    <div class="ticker-badge">ข่าวด่วน</div>
+    <div class="ticker-view">
+      <div class="ticker-text" id="tickerText">HR ประกาศปรับโครงสร้างองค์กร · โบนัสปีนี้อาจล่าช้า · ทีมบิลดิ้งเสาร์หน้า “ไม่บังคับ” · ใครวางแก้วกาแฟไว้บนโต๊ะประชุมอีกแล้ว · เงินเดือนออกวันที่ 25</div>
+    </div>
   </div>
 
   <div class="panel mini-panel">
@@ -34,7 +41,9 @@
     <div class="mini-cap" id="locName">บางรัก · กรุงเทพฯ</div>
   </div>
 
-  <div class="hint"><b>WASD</b> เดิน · <b>E</b> ใช้งาน</div>
+  <div id="mapLabels" class="hidden"></div>
+
+  <div class="hint keyhint"><b>WASD</b> เดิน · <b>E</b> ใช้งาน · <b>M</b> แผนที่ · <b>F</b> การเงิน · <b>J</b> หางาน · <b>L</b> ชีวิต</div>
 
   <div class="prompt hidden" id="prompt">
     <span class="key">E</span><span id="promptText"></span>
@@ -46,6 +55,6 @@
     <div class="panel modal" id="modal"></div>
   </div>
 </div>
-<script src="game.js"></script>
+<script src="game.js?v=20261109ab"></script>
 </body>
 </html>

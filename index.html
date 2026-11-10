@@ -1,0 +1,72 @@
+﻿<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>OpenLife — Life Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+<div id="stage">
+  <div id="world">
+    <canvas id="game" width="1440" height="900" role="img" aria-label="แผนที่เมือง OpenLife"></canvas>
+    <div id="mapLabels" class="hidden"></div>
+    <div id="hotspotLabels"></div>
+    <div class="prompt hidden" id="prompt" role="button" tabindex="0">
+      <span class="key" id="promptKey">E</span><span id="promptText"></span>
+    </div>
+  </div>
+
+  <div class="panel char-card">
+    <canvas id="portrait" width="32" height="32"></canvas>
+    <div class="char-info">
+      <div class="cm-name" id="charName">สมชาย ใจดี</div>
+      <div class="cm-role" id="charRole">พนักงานเงินเดือน · เด็กใหม่</div>
+    </div>
+    <div class="clock">
+      <div class="clk" id="clockTime">07:30</div>
+      <div class="clk-date" id="clockDate">จ. 1 ม.ค. 2569</div>
+      <div class="clk-payday" id="paydayText">เงินเดือนออกอีก 24 วัน</div>
+      <div class="clk-age" id="ageText">อายุ 22 · สร้างตัว</div>
+      <div class="clk-act" id="actText">กิจกรรมเดือนนี้ 0/3</div>
+      <div class="clk-mood" id="moodText">อารมณ์: ปกติ · แดดดี</div>
+    </div>
+  </div>
+
+  <div class="panel stat-panel" id="statPanel"></div>
+
+  <div class="panel ticker">
+    <div class="ticker-badge">ข่าวด่วน</div>
+    <div class="ticker-view">
+      <div class="ticker-text" id="tickerText">HR ประกาศปรับโครงสร้างองค์กร · โบนัสปีนี้อาจล่าช้า · ทีมบิลดิ้งเสาร์หน้า “ไม่บังคับ” · ใครวางแก้วกาแฟไว้บนโต๊ะประชุมอีกแล้ว · เงินเดือนออกวันที่ 25</div>
+    </div>
+  </div>
+
+  <div class="panel mini-panel">
+    <canvas id="mini" width="200" height="140"></canvas>
+    <div class="mini-cap" id="locName">บางรัก · กรุงเทพฯ</div>
+  </div>
+
+  <div class="hud-tools">
+    <button id="helpBtn" class="tool-btn" type="button" aria-label="ช่วยเหลือและคู่มือ">?</button>
+    <button id="soundBtn" class="tool-btn" type="button" aria-label="เปิด/ปิดเสียง">🔊</button>
+  </div>
+
+  <div class="ctl-hint"><b>WASD</b> เดิน · <b>E</b> ใช้งาน · <b>ล้อเมาส์</b> ซูม · <b>M</b> สลับมุมมอง</div>
+
+  <div id="toast" aria-live="polite"></div>
+
+  <div class="overlay hidden" id="overlay" role="dialog" aria-modal="true">
+    <div class="panel modal" id="modal"></div>
+  </div>
+</div>
+
+<div id="rotateHint" class="rotate-hint">หมุนจอเป็นแนวนอนเพื่อเล่นสะดวกขึ้น</div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
+
