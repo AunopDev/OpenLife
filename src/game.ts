@@ -33,6 +33,7 @@ import { ageYears, periodMonths, currentTurnKey } from './sim/time';
 import { RENTAL_INCOME, totalDebt, debtMinPerMonth, costInflation, housingCost, transportCost, familyCost, assetUpkeep, rentalIncome, livingCost, taxPerMonth, socialSecurityPerMonth, fixedPerMonth, lifestyleCost, billsTotalPerTurn, passiveIncomePerMonth } from './sim/economy';
 import { childAgeYears, familyTick } from './sim/family';
 import { buildCityMapArt } from './render/city-map-art';
+import { ArtScale, artToWorld, screenToArt, viewportArt } from './render/scale';
 
 ﻿'use strict';
 
@@ -72,8 +73,9 @@ let ctx = bctx;
 function setPixelScale(p, force?: boolean) {
   if (!force && Math.abs(p - PIX) < 0.001) return;
   PIX = p;
-  AW = Math.ceil(VW / PIX);
-  AH = Math.ceil(VH / PIX);
+  const vp = viewportArt(VW, VH, artScale());
+  AW = vp.w;
+  AH = vp.h;
   buffer.width = AW;
   buffer.height = AH;
   bctx.imageSmoothingEnabled = false;
@@ -683,6 +685,10 @@ function buildingHotspotAtWorld(wx, wy) {
   return null;
 }
 
+function artScale(): ArtScale {
+  return { tilePx: TILE, artPx: ART, screenPx: PIX };
+}
+
 function screenToWorld(clientX, clientY) {
   const rect = cv.getBoundingClientRect();
   if (!rect.width || !rect.height) return null;
@@ -698,7 +704,8 @@ function screenToWorld(clientX, clientY) {
     camAx = Math.round(cam.x / W2A);
     camAy = Math.round(cam.y / W2A);
   }
-  return { x: (cx / PIX + camAx) * W2A, y: (cy / PIX + camAy) * W2A };
+  const s = artScale();
+  return { x: artToWorld(screenToArt(cx, camAx, s), s), y: artToWorld(screenToArt(cy, camAy, s), s) };
 }
 
 function clearWalk() {
