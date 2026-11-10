@@ -36,6 +36,7 @@ import { buildCityMapArt } from './render/city-map-art';
 import { ArtScale, artToWorld, screenToArt } from './render/scale';
 import { drawHuman32, drawAnimal32, HumanLook } from './render/character-art';
 import { drawCar32, CAR_LEN } from './render/vehicle-art';
+import { buildBuildingsLayer32 } from './render/building-art-32';
 
 ﻿'use strict';
 
@@ -4204,6 +4205,8 @@ let cityStatic = null;
 let officeStatic = null;
 let homeStatic = null;
 let stationStatic = null;
+let cityBuildings32 = null;
+let cityBuildings32Flat = null;
 const winGlows = [];
 
 function rngArt(seed) {
@@ -4268,6 +4271,8 @@ function buildStatics() {
   officeStatic = makeLayer(OFFICE_AW, OFFICE_AH, buildOfficeArt);
   homeStatic = makeLayer(HOME_AW, HOME_AH, buildHomeArt);
   stationStatic = makeLayer(STATION_AW, STATION_AH, buildStationArt);
+  cityBuildings32 = buildBuildingsLayer32(MAP_W, MAP_H, BUILDINGS, HOUSES, false);
+  cityBuildings32Flat = buildBuildingsLayer32(MAP_W, MAP_H, BUILDINGS, HOUSES, true);
   if (districtSpec) buildDistrictStatic(districtSpec);
 }
 
@@ -8434,9 +8439,15 @@ function render() {
   if (!mapViewNow) {
     ctx.save();
     ctx.translate(-camAx * OUT_SCALE, -camAy * OUT_SCALE);
-    if (scene === 'city') { drawCars32(); drawPeds32(); }
-    if (scene === 'district') drawNpcs32();
-    drawPlayerArt32();
+    if (scene === 'city' && (cityBuildings32 || cityBuildings32Flat)) {
+      const layer = mapViewNow ? cityBuildings32Flat : cityBuildings32;
+      if (layer) ctx.drawImage(layer, 0, 0);
+    }
+    if (!mapViewNow) {
+      if (scene === 'city') { drawCars32(); drawPeds32(); }
+      if (scene === 'district') drawNpcs32();
+      drawPlayerArt32();
+    }
     ctx.restore();
   }
 
