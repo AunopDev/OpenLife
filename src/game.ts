@@ -34,6 +34,7 @@ import { RENTAL_INCOME, totalDebt, debtMinPerMonth, costInflation, housingCost, 
 import { childAgeYears, familyTick } from './sim/family';
 import { buildCityMapArt } from './render/city-map-art';
 import { ArtScale, artToWorld, screenToArt } from './render/scale';
+import { drawHuman32, drawAnimal32, HumanLook } from './render/character-art';
 
 ﻿'use strict';
 
@@ -49,6 +50,7 @@ let VH = 900;
 
 const ART = 16;              // art pixels per tile (สเกลเลกาซีที่โค้ดวาดภาพใช้)
 const W2A = TILE / ART;      // world px per art px (= 4)
+const W2A_OUT = TILE / (ART * 2); // world px per OUTPUT art px (= 2) — สำหรับสไปรต์ 32px
 /** สเกลเอาต์พุต: 16px art → 32px art (Phase 1 ของการย้ายเป็น 32px/tile)
  *  วาดเลกาซีที่ 16 แล้วขยาย ×2 แบบ nearest — เกม/เซฟ/พิกัด world ไม่เปลี่ยน */
 const OUT_SCALE = 2;
@@ -4187,45 +4189,7 @@ function talkToNpc(n) {
   });
 }
 
-function drawNpcs() {
-  npcs.forEach(function (n) {
-    if (n.type.kind === 'human') {
-      drawPedArt({ x: n.x, y: n.y, phase: n.phase, color: n.type.color, dir: n.dir === 'right' ? 1 : -1 });
-    } else {
-      drawAnimalArt(n);
-    }
-  });
-}
-
-function drawAnimalArt(n) {
-  const x = Math.round(n.x / W2A);
-  const y = Math.round(n.y / W2A);
-  const bob = Math.sin(n.phase) > 0 ? 1 : 0;
-  const c = n.type.color;
-  shadowBlob(x, y - 1, 6);
-  if (n.type.kind === 'wild') {
-    px(x - 5, y - 8 + bob, 10, 7, c);
-    px(x - 6, y - 9 + bob, 3, 3, c);
-    px(x + 3, y - 9 + bob, 3, 3, c);
-    px(x + 4, y - 7 + bob, 2, 1, '#fff');
-    px(x - 7, y - 6 + bob, 1, 1, '#f2f2f8');
-    px(x - 4, y - 2, 2, 2, '#3a2a1e');
-    px(x + 2, y - 2, 2, 2, '#3a2a1e');
-  } else {
-    const body = n.type.id === 'cat' ? 7 : 9;
-    px(x - body / 2 | 0, y - 6 + bob, body, 4, c);
-    px(x + (body / 2 | 0) - 1, y - 8 + bob, 3, 3, c);
-    px(x + (body / 2 | 0) + 1, y - 7 + bob, 1, 1, '#12142a');
-    px(x - (body / 2 | 0) - 1, y - 7 + bob, 1, 2, c);
-    px(x - (body / 2 | 0), y - 2, 2, 2, '#3a2a1e');
-    px(x + (body / 2 | 0) - 2, y - 2, 2, 2, '#3a2a1e');
-  }
-}
-
-/* ==========================================================
-   PIXEL-ART RENDER  ·  16px art tiles, 4x nearest neighbour
-   ========================================================== */
-
+/* ขนาดเลเยอร์ static (art px เลกาซี 16px) */
 const CITY_AW = MAP_W * ART;
 const CITY_AH = MAP_H * ART;
 const OFFICE_AW = OFFICE.w * ART;
@@ -4235,15 +4199,11 @@ const HOME_AH = HOME.h * ART;
 const STATION_AW = STATION.w * ART;
 const STATION_AH = STATION.h * ART;
 
-// palette กลาง P ย้ายไป src/render/palette.ts
-
 let cityStatic = null;
 let officeStatic = null;
 let homeStatic = null;
 let stationStatic = null;
 const winGlows = [];
-
-/* ---------- tiny helpers ---------- */
 
 function rngArt(seed) {
   let s = seed >>> 0;
@@ -6722,70 +6682,63 @@ function drawPedArt(p) {
   px(x - (p.dir >= 0 ? 5 : 4), y - 11 + bob, 2, 4, '#4a5270');
 }
 
-function drawPlayerArt() {
-  const x = Math.round(player.x / W2A);
-  const y = Math.round(player.y / W2A);
-  const moving = player.moving;
-  const swing = Math.sin(player.frame * 3);
-  const s = moving ? (swing > 0 ? 1 : -1) : 0;
-  const arm = moving ? (swing > 0 ? 1 : -1) : 0;
-  const bob = moving ? (Math.abs(swing) > 0.7 ? 1 : 0) : 0;
+/* ---------- ตัวละคร 32px (Phase 2) ---------- */
+
+function playerLook32(): HumanLook {
   const app = life.appearance || Look.DEFAULT_APPEARANCE;
   const ac = Look.appearanceColors(app, ageYears());
+  return {
+    skin: ac.skin,
+    skinDark: ac.skinDark,
+    hair: ac.hair,
+    hairDark: ac.hairDark,
+    clothes: ac.clothes,
+    clothesShade: ac.clothesShade,
+    clothesDark: ac.clothesDark,
+    eye: ac.eye,
+    pants: '#2b3350',
+    hat: !!ac.hat,
+    glasses: app.glasses !== 'none',
+    hairStyle: app.hair
+  };
+}
 
-  shadowBlob(x, y - 1, 9);
+function drawPlayerArt32() {
+  const x = Math.round(player.x / W2A_OUT);
+  const y = Math.round(player.y / W2A_OUT);
+  drawHuman32(ctx, x, y, playerLook32(), {
+    dir: player.dir,
+    moving: player.moving,
+    phase: player.frame * 3
+  });
+}
 
-  // legs — ยาวขึ้นเพื่อให้สัดส่วนเพรียว
-  px(x - 2 + s, y - 7, 2, 6, '#1b2340');
-  px(x + 1 - s, y - 7, 2, 6, '#1b2340');
-  px(x - 3 + s, y - 2, 2, 1, '#0f1428');
-  px(x + 1 - s, y - 2, 2, 1, '#0f1428');
+function npcLook32(n): HumanLook {
+  const c = n.type.color;
+  return {
+    skin: '#f0c9a0',
+    skinDark: '#d9a97c',
+    hair: '#161a2e',
+    hairDark: '#0e1120',
+    clothes: c,
+    clothesShade: c,
+    clothesDark: '#20263f',
+    eye: '#12142a',
+    pants: '#2b3350'
+  };
+}
 
-  // body (สีเสื้อตามที่เลือก) — 6 art px กว้าง
-  px(x - 3, y - 16 + bob, 6, 9, ac.clothes);
-  px(x - 3, y - 16 + bob, 6, 1, ac.clothesShade);
-  px(x - 3, y - 16 + bob, 1, 9, ac.clothesShade);
-  px(x + 2, y - 16 + bob, 1, 9, ac.clothesShade);
-  px(x - 4, y - 15 + bob + arm, 1, 5, ac.clothesShade);
-  px(x + 3, y - 15 + bob - arm, 1, 5, ac.clothesShade);
-  px(x - 1, y - 15 + bob, 2, 5, ac.clothesDark);
-  px(x - 1, y - 10 + bob, 2, 1, ac.clothesDark);
-
-  // head (สีผิว/สีผม)
-  px(x - 3, y - 22 + bob, 6, 6, ac.skin);
-  px(x + 2, y - 21 + bob, 1, 3, ac.skinDark);
-  if (ac.hat) {
-    px(x - 3, y - 24 + bob, 6, 2, ac.clothesDark);
-    px(x - 4, y - 23 + bob, 8, 1, ac.clothesShade);
-  } else {
-    px(x - 3, y - 24 + bob, 6, 3, ac.hair);
-    px(x - 3, y - 22 + bob, 1, 4, ac.hair);
-    px(x + 2, y - 22 + bob, 1, 4, ac.hair);
-    if (player.dir === 'up') px(x - 3, y - 20 + bob, 6, 4, ac.hair);
-    // ผมยาว/หางม้า
-    const hairStyle = (life.appearance || Look.DEFAULT_APPEARANCE).hair;
-    if (hairStyle === 'long' || hairStyle === 'bob') {
-      px(x - 4, y - 21 + bob, 1, 4, ac.hairDark);
-      px(x + 3, y - 21 + bob, 1, 4, ac.hairDark);
+function drawNpcs32() {
+  npcs.forEach(function (n) {
+    const x = Math.round(n.x / W2A_OUT);
+    const y = Math.round(n.y / W2A_OUT);
+    if (n.type.kind === 'human') {
+      drawHuman32(ctx, x, y, npcLook32(n), { dir: n.dir, moving: true, phase: n.phase });
+    } else {
+      const kind = n.type.kind === 'wild' ? 'wild' : (n.type.id === 'cat' ? 'cat' : 'dog');
+      drawAnimal32(ctx, x, y, kind, n.phase);
     }
-  }
-
-  if (player.dir === 'down') {
-    px(x - 2, y - 19 + bob, 1, 1, ac.eye);
-    px(x + 1, y - 19 + bob, 1, 1, ac.eye);
-  } else if (player.dir === 'left') {
-    px(x - 3, y - 19 + bob, 1, 1, ac.eye);
-  } else if (player.dir === 'right') {
-    px(x + 2, y - 19 + bob, 1, 1, ac.eye);
-  }
-
-  // แว่น (ให้ตัวละครบนแมพตรงกับหน้าตาที่สร้าง)
-  if (app.glasses && app.glasses !== 'none' && player.dir !== 'up') {
-    const gc = app.glasses === 'sun' ? '#16161e' : '#2a2a3a';
-    px(x - 3, y - 19 + bob, 7, 1, gc);
-    px(x - 3, y - 18 + bob, 1, 1, gc);
-    px(x + 3, y - 18 + bob, 1, 1, gc);
-  }
+  });
 }
 
 function drawMapMarker() {
@@ -8175,81 +8128,85 @@ function drawLightBlob(x, y, r, color, a) {
   ctx.fillRect(x - r, y - r, r * 2, r * 2);
 }
 
-function drawLighting() {
+function drawLighting(scale?: number) {
+  const S = scale || 1;
+  const AWa = AW * S;
+  const AHa = AH * S;
+  const ARTa = ART * S;
+  const W2Aa = W2A / S;
   const l = lightState();
   const indoor = (scene === 'office' || scene === 'home' || scene === 'station') ? 0.4 : 1;
   if (l[1] > 0.01) {
     ctx.globalAlpha = l[1] * indoor;
-    px(0, 0, AW, AH, l[0]);
+    px(0, 0, AWa, AHa, l[0]);
     ctx.globalAlpha = 1;
   }
   // Yaowarat night market: additive local lights AFTER the night tint
   if (scene === 'city' && l[1] > 0.12 && yaowaratInView(viewMode === 'map')) {
     const mapView = viewMode === 'map';
-    const camAx = mapView ? Math.round((CITY_AW - AW) / 2) : Math.round(cam.x / W2A);
-    const camAy = mapView ? Math.round((CITY_AH - AH) / 2) : Math.round(cam.y / W2A);
+    const camAx = mapView ? Math.round((CITY_AW * S - AWa) / 2) : Math.round(cam.x / W2Aa);
+    const camAy = mapView ? Math.round((CITY_AH * S - AHa) / 2) : Math.round(cam.y / W2Aa);
     const offX = -camAx;
     const offY = -camAy;
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    YAOWARAT_STALLS.forEach(function (s, i) {
-      drawLightBlob(s[0] * ART + offX, s[1] * ART - 6 + offY, 30, '#ffb45c', 0.16 * l[1]);
+    YAOWARAT_STALLS.forEach(function (s) {
+      drawLightBlob(s[0] * ARTa + offX, s[1] * ARTa - 6 * S + offY, 30 * S, '#ffb45c', 0.16 * l[1]);
     });
     YAOWARAT_NEON.forEach(function (n, i) {
       const fl = 0.72 + 0.28 * Math.sin(anim * 4.2 + i * 1.7);
-      drawLightBlob(n[0] * ART + offX, n[1] * ART - 12 + offY, 34, n[2], 0.20 * l[1] * fl);
+      drawLightBlob(n[0] * ARTa + offX, n[1] * ARTa - 12 * S + offY, 34 * S, n[2], 0.20 * l[1] * fl);
     });
     for (let k = 0; k < 7; k++) {
-      drawLightBlob((14.8 + k * 2.35) * ART + offX, 22.7 * ART + offY, 14, '#ff6b4a', 0.14 * l[1]);
+      drawLightBlob((14.8 + k * 2.35) * ARTa + offX, 22.7 * ARTa + offY, 14 * S, '#ff6b4a', 0.14 * l[1]);
     }
     const d = districtAt(Math.floor(player.x / TILE), Math.floor(player.y / TILE));
     if (d && d.id === 'yaowarat') {
-      drawLightBlob(AW / 2, AH / 2, AH * 0.62, '#ff9a55', 0.10 * l[1]);
+      drawLightBlob(AWa / 2, AHa / 2, AHa * 0.62, '#ff9a55', 0.10 * l[1]);
     }
     ctx.restore();
   }
   // District night lights: ไฟถนน ตลาด ศาลเจ้า โรงงาน
   if (scene === 'district' && l[1] > 0.12 && districtSpec) {
-    const offX = -Math.round(cam.x / W2A);
-    const offY = -Math.round(cam.y / W2A);
-    // หน้าต่าง/ป้าย/ร้านเรืองแสง วางทับหลัง tint (กลางวันไม่แสดง)
+    const offX = -Math.round(cam.x / W2Aa);
+    const offY = -Math.round(cam.y / W2Aa);
     if (districtNight) {
       ctx.globalAlpha = clamp((l[1] - 0.08) / 0.5, 0, 1);
-      ctx.drawImage(districtNight, offX, offY);
+      ctx.drawImage(districtNight, offX, offY, districtNight.width * S, districtNight.height * S);
       ctx.globalAlpha = 1;
     }
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     districtLights.forEach(function (g) {
-      drawLightBlob(g.x + offX, g.y + offY, g.r, g.c, g.a * l[1] / 0.62);
+      drawLightBlob(g.x * S + offX, g.y * S + offY, g.r * S, g.c, g.a * l[1] / 0.62);
     });
     districtSpec.props.forEach(function (p) {
-      const lx = p.x * ART + offX;
-      const ly = p.y * ART + offY;
+      const lx = p.x * ARTa + offX;
+      const ly = p.y * ARTa + offY;
       if (p.type === 'lamp') {
-        drawLightBlob(lx + 2, ly - 14, 38, '#ffe9a8', 0.34 * l[1]);
-        drawGlowPool(lx + 2, ly - 3, 22, 8, '#ffe9a8', Math.min(0.22, 0.30 * l[1]));
+        drawLightBlob(lx + 2 * S, ly - 14 * S, 38 * S, '#ffe9a8', 0.34 * l[1]);
+        drawGlowPool(lx + 2 * S, ly - 3 * S, 22 * S, 8 * S, '#ffe9a8', Math.min(0.22, 0.30 * l[1]));
       }
-      else if (p.type === 'stall') drawLightBlob(lx, ly - 10, 30, '#ffb45c', 0.30 * l[1]);
-      else if (p.type === 'lantern') drawLightBlob(lx, ly - 4, 22, '#ff5c6c', 0.32 * l[1]);
-      else if (p.type === 'incense') drawLightBlob(lx, ly - 6, 18, '#ffd75e', 0.22 * l[1]);
+      else if (p.type === 'stall') drawLightBlob(lx, ly - 10 * S, 30 * S, '#ffb45c', 0.30 * l[1]);
+      else if (p.type === 'lantern') drawLightBlob(lx, ly - 4 * S, 22 * S, '#ff5c6c', 0.32 * l[1]);
+      else if (p.type === 'incense') drawLightBlob(lx, ly - 6 * S, 18 * S, '#ffd75e', 0.22 * l[1]);
     });
     if (!districtSpec.style) districtSpec.buildings.forEach(function (b) {
-      const bx = (b.x + b.w / 2) * ART + offX;
-      const by = (b.y + b.h) * ART + offY;
-      if (b.id === 'temple') drawLightBlob(bx, by - 10, 50, '#ffcf5e', 0.34 * l[1]);
-      if (b.id === 'market') drawLightBlob(bx, by - 6, 54, '#ffb45c', 0.30 * l[1]);
-      if (b.id === 'factory') drawLightBlob(bx, by - 8, 44, '#ff8f3f', 0.16 * l[1]);
-      if (b.id === 'school' || b.id === 'health') drawLightBlob(bx, by - 8, 40, '#9fd6ff', 0.14 * l[1]);
+      const bx = (b.x + b.w / 2) * ARTa + offX;
+      const by = (b.y + b.h) * ARTa + offY;
+      if (b.id === 'temple') drawLightBlob(bx, by - 10 * S, 50 * S, '#ffcf5e', 0.34 * l[1]);
+      if (b.id === 'market') drawLightBlob(bx, by - 6 * S, 54 * S, '#ffb45c', 0.30 * l[1]);
+      if (b.id === 'factory') drawLightBlob(bx, by - 8 * S, 44 * S, '#ff8f3f', 0.16 * l[1]);
+      if (b.id === 'school' || b.id === 'health') drawLightBlob(bx, by - 8 * S, 40 * S, '#9fd6ff', 0.14 * l[1]);
     });
     ctx.restore();
   }
-  const g = ctx.createRadialGradient(AW / 2, AH / 2, AH * 0.30, AW / 2, AH / 2, AH * 0.85);
+  const g = ctx.createRadialGradient(AWa / 2, AHa / 2, AHa * 0.30, AWa / 2, AHa / 2, AHa * 0.85);
   g.addColorStop(0, 'rgba(0,0,0,0)');
   g.addColorStop(0.72, 'rgba(0,0,0,.10)');
   g.addColorStop(1, 'rgba(0,0,0,.46)');
   ctx.fillStyle = g;
-  ctx.fillRect(0, 0, AW, AH);
+  ctx.fillRect(0, 0, AWa, AHa);
 }
 
 /* ---------- minimap ---------- */
@@ -8412,40 +8369,43 @@ function render() {
     }
     drawCityDynamic(mapView);
     if (mapView) drawMapMarker();
-    else drawPlayerArt();
   } else if (scene === 'office') {
     ctx.drawImage(officeStatic, 0, 0);
     drawOfficeDynamic();
-    drawPlayerArt();
   } else if (scene === 'district') {
     if (districtStatic) ctx.drawImage(districtStatic, 0, 0);
     drawDistrictDynamic();
-    drawNpcs();
-    drawPlayerArt();
   } else if (scene === 'shop') {
     if (shopStatic) ctx.drawImage(shopStatic, 0, 0);
-    drawPlayerArt();
   } else if (scene === 'station') {
     ctx.drawImage(stationStatic, 0, 0);
-    drawPlayerArt();
   } else {
     ctx.drawImage(homeStatic, 0, 0);
     drawHomeDynamic();
-    drawPlayerArt();
   }
 
   drawMoveMarker();
 
   ctx.restore();
 
-  drawLighting();
-
-  // ขยายเลกาซี 16px → 32px art (nearest) แล้ววาดขึ้นจอ
+  // ขยายเลกาซี 16px → 32px art (nearest)
   ctx = b32ctx;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, AW32, AH32);
   ctx.drawImage(buffer, 0, 0, AW, AH, 0, 0, AW32, AH32);
+
+  // ตัวละคร/NPC/สัตว์ วาดที่ 32px art ทับ (Phase 2)
+  const mapViewNow = scene === 'city' && viewMode === 'map';
+  if (!mapViewNow) {
+    ctx.save();
+    ctx.translate(-camAx * OUT_SCALE, -camAy * OUT_SCALE);
+    if (scene === 'district') drawNpcs32();
+    drawPlayerArt32();
+    ctx.restore();
+  }
+
+  drawLighting(OUT_SCALE);
 
   ctx = mainCtx;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
