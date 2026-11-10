@@ -16,7 +16,7 @@ export function renderBillsHtml(vm: BillsViewModel): string {
     '<div class="pay-table">' +
     row('ค่าเช่า/ที่อยู่ (' + b.months + ' เดือน)', '฿' + fmt(b.rent), 'neg') +
     row('ค่าน้ำค่าไฟ/ค่าครองชีพ', '฿' + fmt(b.utility), 'neg') +
-    row('ค่าใช้จ่ายตามรายได้ (12%)', '฿' + fmt(b.lifestyle), 'neg') +
+    row('ค่าใช้จ่ายตามรายได้', '฿' + fmt(b.lifestyle), 'neg') +
     '<div class="pay-total"><span>รวมบิลเทิร์นนี้</span><b>฿' + fmt(b.total) + '</b></div>' +
     '</div>' +
     '<div class="pay-debt">เงินสด <b>฿' + fmt(vm.money) + '</b> · ' +

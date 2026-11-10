@@ -85,6 +85,32 @@ describe('เงินเฟ้อและค่าครองชีพ', func
   });
 });
 
+describe('ค่าครองชีพตามรายได้ (progressive lifestyle)', function () {
+  it('≤40k คิด 12%', function () {
+    finance.salary = 22000;
+    expect(lifestyleCost()).toBe(2640);
+    finance.salary = 40000;
+    expect(lifestyleCost()).toBe(4800);
+  });
+  it('ขั้นบันได 12/18/25/30%', function () {
+    finance.salary = 80000;
+    expect(lifestyleCost()).toBe(4800 + 7200);
+    finance.salary = 150000;
+    expect(lifestyleCost()).toBe(4800 + 7200 + 17500);
+    finance.salary = 300000;
+    expect(lifestyleCost()).toBe(4800 + 7200 + 17500 + 45000);
+  });
+  it('รวมรายได้พาสซีฟเป็นฐานคิด', function () {
+    finance.salary = 40000;
+    life.flags.condo = true; // +3,000/เดือน
+    expect(lifestyleCost()).toBe(4800 + Math.round(3000 * 0.18));
+  });
+  it('ไม่มีรายได้ → 0', function () {
+    finance.salary = 0;
+    expect(lifestyleCost()).toBe(0);
+  });
+});
+
 describe('หนี้', function () {
   it('รวมหนี้และขั้นต่ำเฉพาะก้อนที่ยังค้าง', function () {
     debts.credit.balance = 10000;

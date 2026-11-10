@@ -26,6 +26,9 @@ import * as LookEditor from './character/appearance-editor';
 import { stats, world, flags, profile, finance, career, debts, life, SAVE_KEY } from './core/state';
 import { P } from './render/palette';
 import { createBills, billsPaidThisTurn, settleBillsAtMonthEnd } from './features/bills';
+import { createAssets, HOME_COSTS, assetPrestige } from './features/assets';
+import { createBusiness } from './features/business';
+import { createJobSearch } from './features/job-search';
 import { ageYears, periodMonths, currentTurnKey } from './sim/time';
 import { RENTAL_INCOME, totalDebt, debtMinPerMonth, costInflation, housingCost, transportCost, familyCost, assetUpkeep, rentalIncome, livingCost, taxPerMonth, socialSecurityPerMonth, fixedPerMonth, lifestyleCost, billsTotalPerTurn, passiveIncomePerMonth } from './sim/economy';
 import { childAgeYears, familyTick } from './sim/family';
@@ -927,19 +930,6 @@ function chapterData(n) {
 
 const ACTIONS_PER_TURN = 3;
 
-const HOME_COSTS = [500000, 1500000, 4000000];
-const CAR_TIERS = [
-  { name: 'รถยนต์ครอบครัว', cost: 600000 },
-  { name: 'SUV', cost: 1800000 },
-  { name: 'รถหรู', cost: 5000000 }
-];
-const ASSET_TRIPS = [
-  { name: 'พักผ่อนในประเทศ', cost: 50000, heart: 6, fun: 20, rest: 15, stamp: 1 },
-  { name: 'ทริปญี่ปุ่น', cost: 250000, heart: 9, fun: 30, rest: 20, stamp: 1, skill: 'creativity' },
-  { name: 'ทริปยุโรป', cost: 800000, heart: 12, fun: 40, rest: 25, stamp: 1, skill: 'communication' }
-];
-const RENTAL_COSTS = [3000000, 5000000, 8000000];
-
 function actionBudget() {
   const m = Math.max(1, life.periodMonths || 1);
   if (m >= 12) return 9;
@@ -1610,7 +1600,7 @@ function pickEventFromPool(pool, forceFirst) {
   life.lastEventTitle = ev.title;
   if (!life.recentEvents) life.recentEvents = [];
   life.recentEvents.push(ev.title);
-  while (life.recentEvents.length > 16) life.recentEvents.shift();
+  while (life.recentEvents.length > 24) life.recentEvents.shift();
   return ev;
 }
 
@@ -3404,70 +3394,18 @@ function districtActivity(id) {
   toast(label + ' · ' + d.vibe);
 }
 
-function openBusiness() {
-  if (paused) return;
-  const b = life.business || { active: false, type: '', level: 0, monthly: 0, invested: 0 };
-  if (!b.active) {
-    const options = [
-      { type: 'ร้านกาแฟเล็ก ๆ', cost: 600000, monthly: 30000 },
-      { type: 'ร้านค้าออนไลน์', cost: 300000, monthly: 18000 },
-      { type: 'สวนผัก/ฟาร์มเล็ก', cost: 400000, monthly: 22000 }
-    ];
-    const html =
-      '<div class="ev-head"><span class="ev-chip">ธุรกิจ</span><span>ลงทุนได้ครั้งเดียว</span></div>' +
-      '<div class="ev-title">เปิดธุรกิจของตัวเอง</div>' +
-      '<div class="pay-debt">เงินสด <b>฿' + fmt(stats.money) + '</b> · รายได้จะเข้ากระเป๋าทุกเทิร์น</div>' +
-      '<div class="choices">' + options.map(function (o, i) {
-        return '<button class="choice" data-choice="' + i + '"><span class="c-label">' + o.type + '</span>' +
-          '<span class="c-hint"><span class="hint down">ลงทุน ฿' + fmt(o.cost) + '</span><span class="hint up">+฿' + fmt(o.monthly) + '/เดือน</span></span></button>';
-      }).join('') + '</div>' +
-      '<button class="btn-ghost" id="bizClose">ยังไม่เปิด</button>';
-    openModal(html);
-    document.getElementById('bizClose').addEventListener('click', closeModal);
-    bindChoices(function (i) {
-      const o = options[i];
-      if (!o) return;
-      if (stats.money < o.cost) { toast('เงินไม่พอลงทุน ฿' + fmt(o.cost)); return; }
-      stats.money -= o.cost;
-      life.business = { active: true, type: o.type, level: 1, monthly: o.monthly, invested: o.cost };
-      life.flags.business = true;
-      life.rel.friend = clamp(life.rel.friend + 3, 0, 100);
-      addAchievement('business', 'เปิดธุรกิจ');
-      saveGame();
-      closeModal();
-      updateHud();
-      toast('เปิด ' + o.type + ' แล้ว · +฿' + fmt(o.monthly) + '/เดือน');
-    });
-    return;
-  }
+/* ธุรกิจ: feature module (src/features/business) — ดู docs/rules/architecture.md */
+const businessFeature = createBusiness({
+  isPaused: function () { return paused; },
+  openModal: openModal,
+  closeModal: closeModal,
+  toast: toast,
+  saveGame: saveGame,
+  updateHud: updateHud,
+  addAchievement: addAchievement
+});
 
-  const upgradeCost = b.level * 400000;
-  const html =
-    '<div class="ev-head"><span class="ev-chip">ธุรกิจ</span><span>ระดับ ' + b.level + '</span></div>' +
-    '<div class="ev-title">' + b.type + '</div>' +
-    '<div class="pay-table">' +
-    payRow('รายได้ต่อเดือน', '+' + fmt(b.monthly), 'pos') +
-    payRow('เงินลงทุนสะสม', fmt(b.invested), '') +
-    '</div>' +
-    (b.level < 3 ? '<button class="btn-primary" id="bizUpgrade">อัปเกรด ฿' + fmt(upgradeCost) + ' (+50% รายได้)</button>' : '<div class="pay-warn">ธุรกิจถึงระดับสูงสุดแล้ว</div>') +
-    '<button class="btn-ghost" id="bizClose">ปิด</button>';
-  openModal(html);
-  document.getElementById('bizClose').addEventListener('click', closeModal);
-  const up = document.getElementById('bizUpgrade');
-  if (up) {
-    up.addEventListener('click', function () {
-      if (stats.money < upgradeCost) { toast('เงินไม่พออัปเกรด ฿' + fmt(upgradeCost)); return; }
-      stats.money -= upgradeCost;
-      b.invested += upgradeCost;
-      b.level += 1;
-      b.monthly = Math.round(b.monthly * 1.4);
-      saveGame();
-      closeModal();
-      updateHud();
-      toast('อัปเกรดธุรกิจเป็นระดับ ' + b.level + ' · +฿' + fmt(b.monthly) + '/เดือน');
-    });
-  }
-}
+function openBusiness() { businessFeature.open(); }
 
 function openHomeUpgrade() {
   if (paused) return;
@@ -3502,186 +3440,23 @@ function openHomeUpgrade() {
   }
 }
 
-function assetPrestige() {
-  const a = life.assets || {};
-  const biz = life.business && life.business.active ? (life.business.level || 0) * 2 : 0;
-  return (life.homeLevel || 0) * 2 + (a.carTier || 0) * 3 + biz +
-    Math.min(5, a.trips || 0) + Math.min(5, Math.floor((a.donated || 0) / 1000000) * 2) +
-    (a.rentals || 0) * 4;
-}
+/* ทรัพย์สิน/ไลฟ์สไตล์: feature module (src/features/assets) — ดู docs/rules/architecture.md */
+const assetsFeature = createAssets({
+  isPaused: function () { return paused; },
+  openModal: openModal,
+  closeModal: closeModal,
+  getModal: function () { return modal; },
+  toast: toast,
+  saveGame: saveGame,
+  updateHud: updateHud,
+  openFinance: function () { openFinance(true); },
+  openBusiness: openBusiness,
+  addAchievement: addAchievement,
+  addNeed: addNeed,
+  gainSkill: gainSkill
+});
 
-function openAssets() {
-  if (paused) return;
-  const a = life.assets || (life.assets = { carTier: 0, trips: 0, donated: 0, invest: 0 });
-  const b = life.business || { active: false, type: '', level: 0, monthly: 0, invested: 0 };
-  const home = life.homeLevel || 0;
-  const car = a.carTier || 0;
-  const carReady = debts.car.balance <= 0;
-  const tripMult = Math.max(0.3, 1 - (a.trips || 0) * 0.08);
-  const homeBtn = home < 3
-    ? '<button class="btn-primary" data-asset="home">อัปเกรดระดับ ' + (home + 1) + ' · ฿' + fmt(HOME_COSTS[home]) + '</button>'
-    : '<div class="pay-warn">บ้านถึงระดับสูงสุดแล้ว</div>';
-  const carBtn = car >= 3
-    ? '<div class="pay-warn">รถถึงระดับสูงสุดแล้ว</div>'
-    : (!carReady
-      ? '<div class="pay-warn">ปิดไฟแนนซ์รถก่อนอัปเกรด</div>'
-      : '<button class="btn-primary" data-asset="car">อัปเกรดเป็น ' + CAR_TIERS[car].name + ' · ฿' + fmt(CAR_TIERS[car].cost) + '</button>');
-  const tripRows = ASSET_TRIPS.map(function (t, i) {
-    return '<div class="asset-line">' +
-      '<div class="asset-info"><b>' + t.name + '</b><span>ใจ +' + Math.round(t.heart * tripMult) +
-      ' · สนุก +' + Math.round(t.fun * tripMult) + ' · ของที่ระลึก +1</span></div>' +
-      '<button class="btn-ghost" data-trip="' + i + '">฿' + fmt(t.cost) + '</button>' +
-      '</div>';
-  }).join('');
-  const investBtns = [100000, 500000, 1000000].map(function (amt) {
-    const dis = stats.money < amt ? ' disabled' : '';
-    return '<button class="btn-ghost" data-invest="' + amt + '"' + dis + '>ลงทุน ฿' + fmt(amt) + '</button>';
-  }).join('');
-  const rentals = a.rentals || 0;
-  const rentalBtn = rentals >= 3
-    ? '<div class="pay-warn">อสังหาริมทรัพย์ถึงระดับสูงสุดแล้ว</div>'
-    : '<button class="btn-primary" data-asset="rental">ซื้อห้องเช่า · ฿' + fmt(RENTAL_COSTS[rentals]) + '</button>';
-
-  const html =
-    '<div class="ev-head"><span class="ev-chip">ทรัพย์สิน</span><span>เงินสด ฿' + fmt(stats.money) + '</span>' +
-    '<button class="ev-x" id="assetX" type="button" aria-label="ปิด">✕</button></div>' +
-    '<div class="ev-title">ทรัพย์สินและไลฟ์สไตล์</div>' +
-    '<div class="pay-debt">Prestige <b>' + assetPrestige() + '</b> · ลงทุน <b>฿' + fmt(a.invest) + '</b> · ห้องเช่า <b>' + rentals + '</b> · ทริป <b>' + (a.trips || 0) + '</b> ครั้ง · บริจาค <b>฿' + fmt(a.donated) + '</b></div>' +
-
-    '<div class="asset-block"><div class="asset-head"><b>บ้าน</b><span>ระดับ ' + home + '/3</span></div>' +
-    '<div class="asset-desc">โบนัสใจ +' + home + '/เดือน · ค่าดูแล ฿' + fmt(home * 1500) + '/เดือน</div>' + homeBtn + '</div>' +
-
-    '<div class="asset-block"><div class="asset-head"><b>รถ</b><span>' + (car > 0 ? CAR_TIERS[car - 1].name : (carReady ? 'ยังไม่มีรถส่วนตัว' : 'รถไฟแนนซ์')) + '</span></div>' +
-    '<div class="asset-desc">' + (car > 0 ? 'ระดับ ' + car + '/3 · ค่าดูแล ฿' + fmt(car * 800) + '/เดือน' : 'อัปเกรดได้เมื่อปิดไฟแนนซ์แล้ว') + '</div>' + carBtn + '</div>' +
-
-    '<div class="asset-block"><div class="asset-head"><b>อสังหาริมทรัพย์ให้เช่า</b><span>' + rentals + '/3 ห้อง</span></div>' +
-    '<div class="asset-desc">' + (rentals > 0
-      ? 'รายได้ +฿' + fmt(rentalIncome()) + '/เดือน · ค่าดูแล ฿' + fmt(rentals * 3000) + '/เดือน'
-      : 'ซื้อห้องเช่าเพื่อสร้างรายได้ประจำ') + '</div>' + rentalBtn + '</div>' +
-
-    '<div class="asset-block"><div class="asset-head"><b>ธุรกิจ</b><span>' + (b.active ? b.type + ' · ระดับ ' + b.level : 'ยังไม่มี') + '</span></div>' +
-    '<div class="asset-desc">' + (b.active ? 'รายได้ +฿' + fmt(b.monthly) + '/เดือน' : 'ลงทุนเพื่อสร้างรายได้ระยะยาว') + '</div>' +
-    '<button class="btn-primary" data-asset="business">' + (b.active ? 'จัดการธุรกิจ' : 'เปิดธุรกิจ') + '</button></div>' +
-
-    '<div class="asset-block"><div class="asset-head"><b>การลงทุน</b><span>฿' + fmt(a.invest) + '</span></div>' +
-    '<div class="asset-desc">เติบโตประมาณ 0.3%/เดือน · ถอนได้ทุกเมื่อ</div>' +
-    '<div class="asset-actions">' + investBtns +
-    '<button class="btn-ghost" data-asset="withdraw"' + (a.invest > 0 ? '' : ' disabled') + '>ถอนทั้งหมด</button></div></div>' +
-
-    '<div class="asset-block"><div class="asset-head"><b>ทริป / ประสบการณ์</b><span>' + (a.trips || 0) + ' ครั้ง</span></div>' +
-    '<div class="asset-desc">ผลตอบแทนจะลดลงถ้าไปบ่อยเกินไป (ปัจจุบัน ×' + tripMult.toFixed(2) + ')</div>' + tripRows + '</div>' +
-
-    '<div class="asset-block"><div class="asset-head"><b>บริจาค / มรดกสังคม</b><span>฿' + fmt(a.donated) + '</span></div>' +
-    '<div class="asset-desc">บริจาคเพื่อเพิ่ม legacy และความหมายของชีวิต</div>' +
-    '<div class="asset-actions"><button class="btn-primary" data-asset="donate">บริจาค ฿1,000,000</button>' +
-    '<button class="btn-ghost" data-asset="donate5">กองทุนมรดก ฿5,000,000</button></div></div>' +
-
-    '<div class="asset-actions"><button class="btn-ghost" id="assetFinance">← การเงิน</button>' +
-    '<button class="btn-ghost" id="assetClose">ปิด</button></div>';
-
-  openModal(html);
-  document.getElementById('assetClose').addEventListener('click', closeModal);
-  document.getElementById('assetX').addEventListener('click', closeModal);
-  document.getElementById('assetFinance').addEventListener('click', function () {
-    closeModal();
-    openFinance(true);
-  });
-  function refresh() {
-    const keepScroll = modal.scrollTop;
-    closeModal();
-    openAssets();
-    modal.scrollTop = keepScroll;
-  }
-  function spend(cost) {
-    if (stats.money < cost) { toast('เงินไม่พอ ฿' + fmt(cost)); return false; }
-    stats.money -= cost;
-    return true;
-  }
-  modal.querySelectorAll('[data-asset]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const what = btn.getAttribute('data-asset');
-      if (what === 'home') {
-        if (home >= 3) return;
-        if (!spend(HOME_COSTS[home])) return;
-        life.homeLevel = home + 1;
-        stats.heart = clamp(stats.heart + 8, 0, 100);
-        addAchievement('home_' + life.homeLevel, 'บ้านระดับ ' + life.homeLevel);
-        if (life.homeLevel >= 3) addAchievement('home_max', 'บ้านระดับสูงสุด');
-        saveGame(); updateHud(); refresh();
-        toast('บ้านอัปเกรดเป็นระดับ ' + life.homeLevel + ' · ใจ +8');
-      } else if (what === 'car') {
-        if (car >= 3) return;
-        if (debts.car.balance > 0) { toast('ปิดไฟแนนซ์รถก่อนอัปเกรด'); return; }
-        const tier = CAR_TIERS[car];
-        if (!spend(tier.cost)) return;
-        a.carTier = car + 1;
-        life.flags.car = true;
-        stats.heart = clamp(stats.heart + 6, 0, 100);
-        addAchievement('car_tier_' + a.carTier, 'รถระดับ ' + a.carTier);
-        saveGame(); updateHud(); refresh();
-        toast('ได้ ' + tier.name + ' · ใจ +6');
-      } else if (what === 'business') {
-        closeModal();
-        openBusiness();
-      } else if (what === 'rental') {
-        if ((a.rentals || 0) >= 3) return;
-        const cost = RENTAL_COSTS[a.rentals || 0];
-        if (!spend(cost)) return;
-        a.rentals = (a.rentals || 0) + 1;
-        addAchievement('rental_' + a.rentals, 'ห้องเช่า ' + a.rentals + ' ห้อง');
-        saveGame(); updateHud(); refresh();
-        toast('ซื้อห้องเช่า · รายได้รวม ฿' + fmt(rentalIncome()) + '/เดือน');
-      } else if (what === 'withdraw') {
-        if (a.invest <= 0) return;
-        stats.money += a.invest;
-        toast('ถอนเงินลงทุน ฿' + fmt(a.invest));
-        a.invest = 0;
-        saveGame(); updateHud(); refresh();
-      } else if (what === 'donate') {
-        if (!spend(1000000)) return;
-        a.donated = (a.donated || 0) + 1000000;
-        stats.heart = clamp(stats.heart + 3, 0, 100);
-        addAchievement('donor', 'ผู้ให้');
-        saveGame(); updateHud(); refresh();
-        toast('บริจาค ฿1,000,000 · legacy +');
-      } else if (what === 'donate5') {
-        if (!spend(5000000)) return;
-        a.donated = (a.donated || 0) + 5000000;
-        stats.heart = clamp(stats.heart + 6, 0, 100);
-        addAchievement('donor', 'ผู้ให้');
-        addAchievement('patron', 'ผู้สนับสนุนกองทุนมรดก');
-        saveGame(); updateHud(); refresh();
-        toast('ตั้งกองทุนมรดก ฿5,000,000 · legacy ++');
-      }
-    });
-  });
-  modal.querySelectorAll('[data-invest]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const amt = Number(btn.getAttribute('data-invest')) || 0;
-      if (!spend(amt)) return;
-      a.invest = (a.invest || 0) + amt;
-      if (a.invest >= 1000000) addAchievement('invest_1m', 'เงินลงทุนครบ 1 ล้าน');
-      saveGame(); updateHud(); refresh();
-      toast('ลงทุน ฿' + fmt(amt) + ' · มูลค่ารวม ฿' + fmt(a.invest));
-    });
-  });
-  modal.querySelectorAll('[data-trip]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const t = ASSET_TRIPS[Number(btn.getAttribute('data-trip'))];
-      if (!t || !spend(t.cost)) return;
-      const m = Math.max(0.3, 1 - (a.trips || 0) * 0.08);
-      stats.heart = clamp(stats.heart + Math.round(t.heart * m), 0, 100);
-      addNeed('fun', Math.round(t.fun * m));
-      addNeed('rest', Math.round(t.rest * m));
-      if (t.skill) gainSkill(t.skill, 1);
-      life.collections.stamps = (life.collections.stamps || 0) + (t.stamp || 0);
-      a.trips = (a.trips || 0) + 1;
-      if (a.trips >= 3) addAchievement('trips_3', 'ท่องเที่ยว 3 ครั้ง');
-      saveGame(); updateHud(); refresh();
-      toast(t.name + ' · ใจ +' + Math.round(t.heart * m));
-    });
-  });
-}
+function openAssets() { assetsFeature.open(); }
 
 function openQuickActions() {
   if (life.phase !== 'adult' || paused) return;
@@ -3865,82 +3640,21 @@ function openFinance(force) {
   });
 }
 
-function openJobSearch() {
-  if (paused) return;
-  if (life.phase !== 'adult') return;
-  if (life.flags.retired) { toast('เกษียณแล้ว · ไม่ต้องหางานเพิ่ม'); return; }
-  if (finance.salary > 0) { toast('คุณยังมีงานอยู่'); return; }
-  if (life.flags.jobSearchTurn === currentTurnKey()) {
-    toast('ลองหางานแล้วเทิร์นนี้ · รอเทิร์นหน้า');
-    return;
-  }
+/* หางาน: feature module (src/features/job-search) — ดู docs/rules/architecture.md */
+const jobSearchFeature = createJobSearch({
+  isPaused: function () { return paused; },
+  currentTurnKey: currentTurnKey,
+  wearingFormal: wearingFormal,
+  openModal: openModal,
+  closeModal: closeModal,
+  toast: toast,
+  saveGame: saveGame,
+  updateHud: updateHud,
+  hire: hireJob,
+  rng: Math.random
+});
 
-  const age = ageYears();
-  let chance = 45 + (stats.smarts - 50) * 0.4 + (stats.social - 50) * 0.4 - Math.max(0, age - 40) * 1.2;
-  chance += ((life.grooming === undefined ? 70 : life.grooming) - 50) * 0.18;
-  chance += wearingFormal() ? 8 : -2;
-  if (life.traits.indexOf('มีคอนเนคชัน') >= 0) chance += 10;
-  chance += Math.min(20, (life.skills.communication || 0) * 0.2);
-  chance = clamp(Math.round(chance), 10, 90);
-  const officeSalary = Math.max(15000, 16000 + Math.round(stats.smarts * 80) + Math.round(stats.social * 40) - Math.max(0, age - 40) * 150 + (life.traits.indexOf('มีคอนเนคชัน') >= 0 ? 2000 : 0) + Math.round((life.skills.tech || 0) * 30));
-  const freeSalary = Math.max(8000, 7000 + Math.round(stats.social * 50) + Math.round(stats.smarts * 30));
-  const looksOk = (life.grooming === undefined ? 70 : life.grooming) >= 55 && stats.social >= 40;
-  const looksSalary = Math.max(12000, 9000 + Math.round((life.grooming === undefined ? 70 : life.grooming) * 140) + Math.round(stats.social * 60) + Math.round((life.skills.creativity || 0) * 90));
-  const looksChance = clamp(Math.round(
-    30 + ((life.grooming === undefined ? 70 : life.grooming) - 50) * 0.5 +
-    (stats.social - 50) * 0.3 + (life.skills.creativity || 0) * 0.2 - Math.max(0, age - 35) * 0.6
-  ), 10, 90);
-
-  let choices = '';
-  choices += '<button class="choice" data-choice="0"><span class="c-label">1. สมัครงานออฟฟิศ (โอกาส ' + chance + '%)</span>' +
-    '<span class="c-hint"><span class="hint up">เงินเดือน ~฿' + fmt(officeSalary) + '</span><span class="hint req">เสี่ยงไม่ผ่าน</span></span></button>';
-  choices += '<button class="choice" data-choice="1"><span class="c-label">2. รับงานฟรีแลนซ์/พาร์ทไทม์</span>' +
-    '<span class="c-hint"><span class="hint up">ได้แน่ ~฿' + fmt(freeSalary) + '</span><span class="hint down">ไม่มีสวัสดิการ</span></span></button>';
-  if (looksOk) {
-    choices += '<button class="choice" data-choice="3"><span class="c-label">3. สมัครงานนายแบบ/นักแสดง/อินฟลูเอนเซอร์ (โอกาส ' + looksChance + '%)</span>' +
-      '<span class="c-hint"><span class="hint up">~฿' + fmt(looksSalary) + '</span><span class="hint req">ใช้ลุค + ความเรียบร้อย + ความสร้างสรรค์</span></span></button>';
-  }
-  choices += '<button class="choice" data-choice="2"><span class="c-label">' + (looksOk ? '4' : '3') + '. พักก่อน</span></button>';
-
-  const html =
-    '<div class="ev-head"><span class="ev-chip">หางาน</span><span>อายุ ' + age + ' ปี</span></div>' +
-    '<div class="ev-title">ตกงาน — จะไปทางไหนต่อ?</div>' +
-    '<div class="ev-text">เรซูเม่ถูกส่งไปหลายที่ แต่ตลาดงานอายุ 45+ ไม่ได้ใจดีกับใคร<br>' +
-    'การแต่งตัว: <b>' + (wearingFormal() ? 'สุภาพ (เชิ้ต/เบลาส์)' : 'ลำลอง') + '</b> · ความเรียบร้อย <b>' + Math.round(life.grooming === undefined ? 70 : life.grooming) + '</b>/100</div>' +
-    '<div class="choices">' + choices + '</div>';
-
-  openModal(html);
-  bindChoices(function (i) {
-    if (i === 0) {
-      life.flags.jobSearchTurn = currentTurnKey();
-      if (Math.random() < chance / 100) {
-        hireJob(officeSalary, 'office');
-      } else {
-        stats.heart = clamp(stats.heart - 3, 0, 100);
-        closeModal();
-        saveGame();
-        updateHud();
-        toast('สัมภาษณ์ไม่ผ่าน · ใจ −3');
-      }
-    } else if (i === 1) {
-      life.flags.jobSearchTurn = currentTurnKey();
-      hireJob(freeSalary, 'free');
-    } else if (i === 3) {
-      life.flags.jobSearchTurn = currentTurnKey();
-      if (Math.random() < looksChance / 100) {
-        hireJob(looksSalary, 'looks');
-      } else {
-        stats.heart = clamp(stats.heart - 2, 0, 100);
-        closeModal();
-        saveGame();
-        updateHud();
-        toast('แคสติ้งไม่ผ่าน · ใจ −2');
-      }
-    } else {
-      closeModal();
-    }
-  });
-}
+function openJobSearch() { jobSearchFeature.open(); }
 
 function hireJob(salary, kind) {
   if (kind === 'looks') {

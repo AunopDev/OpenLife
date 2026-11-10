@@ -1115,6 +1115,22 @@ body.modal-open .overlay { padding-top: calc(60px + env(safe-area-inset-top)); }
 /* ระหว่างเปิด modal แสดงเฉพาะ toast ล่าสุด (อันใหม่ต่อท้าย) ให้พอดีพื้นที่ที่เว้นไว้ */
 body.modal-open #toast .toast-item:not(:last-child) { display: none; }
 
+/* มือถือ: ตอนเปิด modal ให้ซ่อน HUD แล้วใช้พื้นที่ด้านบนเป็นที่วาง toast
+   (ไม่ทับ modal และไม่ทับ HUD เพราะ HUD ถูกซ่อน) */
+@media (max-width: 900px) {
+  body.modal-open .char-card,
+  body.modal-open .stat-panel,
+  body.modal-open .hud-tools { display: none; }
+  body.modal-open #toast {
+    display: flex;
+    top: calc(8px + env(safe-area-inset-top));
+    bottom: auto;
+    left: 50%;
+    max-width: 92vw;
+  }
+  body.modal-open .overlay { padding-top: calc(64px + env(safe-area-inset-top)); }
+}
+
 /* portrait phones: stack and save space */
 @media (orientation: portrait) and (max-width: 900px) {
   /* โลกเกมเต็มพื้นที่ระหว่าง HUD บน-ล่าง (B-001) — ค่ามาจาก placeWorldBetweenHud() ใน game.ts */

@@ -43,24 +43,29 @@
 - แยกชื่อ-นามสกุลเป็น 2 ช่อง, แก้กรอบแว่นให้พอดีหน้า
 - Refactor state กลางเป็น `src/core/state.ts` (types + default)
 
-### Quality gates ที่ผ่านล่าสุด
-`npx tsc --noEmit` ✅ · `npm run build` ✅ · console ไม่มี error ✅
-`__layoutAudit()` = `[]` · `__ol.districtAudit()` = `[]` · `__ol.dataAudit().issues` = 0
-`__ol.narrativeAudit()` = 0 · `__ol.invariantAudit()` = 0 · `__ol.geoAudit()` = 0 · `__ol.appearanceAudit()` = 0
+### Quality gates ที่ผ่านล่าสุด (รัน `npm run check` ครบ)
+- `typecheck` ✅ · **unit 542 tests / 9 ไฟล์** ✅ · `build` ✅ · **e2e 45 passed (4 ขนาดจอ)** ✅
+- audit ทุกตัว = `[]` / 0 · console ไม่มี error
+- ภาพตรวจด้วยตา: `test-results/screens/<project>/*.png`
+
+### โครงสร้างปัจจุบัน (refactor แล้ว)
+`src/core` (state/save/date/util/picker) · `src/sim` (time/economy/family) · `src/content` (events/pools/audit) · `src/world` (geo/districts/maps/map-audit) · `src/render` (pixel/palette/city-*) · `src/character` · `src/gameplay` · `src/ui` · `src/audio`
+`src/features/` — **bills** (บิลที่อยู่) · **assets** (ทรัพย์สิน/ไลฟ์สไตล์) · **business** (ธุรกิจ) · **job-search** (หางาน) — ทุกตัวมี service/view/controller/types + unit test
+`game.ts` ยังใหญ่ + `@ts-nocheck` (ทยอยแยกต่อ)
 
 ---
 
 ## 3) สิ่งที่ต้องการให้ทำต่อ (เรียงตามลำดับความสำคัญ)
 
-### P0 — บั๊ก/ความถูกต้อง
-1. **ความสอดคล้องตัวละคร**: portrait ใน HUD / หน้าสร้างตัว / sprite บนแผนที่ ต้องเหมือนกันจริง (รวมความคมชัดตอนสเกล)
-2. **ตรวจทุกเขต**: สร้างชีวิตใหม่แล้วเลือกทุกเขต ต้องขึ้นชื่อเขตถูก, แผนที่ถูก, audit ผ่าน
-3. **Save เก่า**: เซฟที่มี `neighborhood` เดิมต้องโหลดได้ไม่พัง
+### P0 — บั๊ก/ความถูกต้อง (เหลือน้อย)
+1. **B-002 เงินปลายเกมสูง** — ลดแล้ว 26% ด้วย progressive lifestyle (ดู `docs/BALANCE.md`) · เหลือตัดสินใจว่าจะเพิ่ม sink หรือ nerf รายได้ (ควรวัดนโยบาย "ผู้เล่นทั่วไป" ที่มีบ้าน/รถ/ครอบครัวก่อน)
+2. **B-003 event ซ้ำ** — เป็นข้อจำกัด *จำนวนเนื้อหา* ไม่ใช่ picker (ขยาย pool = งานเขียน event; ต้องมี research)
+3. **art 16px → 32px (เฟส 1)** — ยังไม่เริ่ม (`ART = 16`) แผนอยู่ใน `docs/rules/art.md §1`
 
 ### P1 — UX ที่ยังไม่ดี
-4. **HUD ยังแน่นไป**: ลดข้อมูลที่โชว์ตลอด (ย้ายรายละเอียดไปหน้ากดดู) — โดยเฉพาะบนจอเล็ก
-5. **การนำทางด้วยการแตะ**: ยังรู้สึกไม่แม่น/ไม่ลื่น — ตรวจ hit area, path smoothing, การหยุดที่ประตู, marker
-6. **ช่วงวัยเด็กยังน่าเบื่อ**: ตอนนี้เป็นการ์ด + ภาพประกอบ — อยากได้ความสนุกจริง (มินิเกมสั้น/การโต้ตอบ/จังหวะเล่าเรื่อง)
+4. **HUD ยังแน่นไปบนจอเล็ก** — ย้ายรายละเอียดไปหน้ากดดู (ซ่อน HUD ตอนเปิด modal แล้ว)
+5. **การแตะนำทาง**: hit area, path smoothing, การหยุดที่ประตู, marker
+6. **วัยเด็กยังน่าเบื่อ**: มีภาพประกอบฉากแล้ว — อยากได้มินิเกมสั้น/จังหวะเล่าเรื่อง
 
 ### P2 — เนื้อหา/โลก
 7. **ภายในอาคารให้ต่างกันจริง**: ตอนนี้ใช้โครงห้องร่วม — อยากให้แต่ละประเภทยูนีค (ร้านของชำ/ตลาด/ยิม/คลินิก/ศาลเจ้า)
@@ -70,8 +75,8 @@
 11. **ความหนาแน่นของโลก**: ป้ายร้าน, พร็อพ, คนเดิน, แสงกลางคืน — เพิ่มแต่ไม่ให้รก
 
 ### P3 — โครงสร้าง
-12. แตก `src/game.ts` (ใหญ่ ~360KB) เป็นโมดูลตาม AGENTS
-13. ปรับ balance (crime ending / promotion / ค่าครองชีพ) และอัปเดต `docs/GDD.md` ทุกครั้งที่เปลี่ยน mechanic
+12. แตก `src/game.ts` เป็น feature module ต่อ — แยกแล้ว **bills · assets · business · job-search**; เป้าถัดไป: finance/debts, quick-actions, home-upgrade, NPC/ความสัมพันธ์
+13. ปรับ balance ต่อ (crime ending / promotion / เงินปลายเกม) + อัปเดต `docs/GDD.md` ทุกครั้งที่เปลี่ยน mechanic
 
 ---
 
@@ -80,7 +85,7 @@
 - **RESEARCH FIRST**: ก่อนเพิ่มเนื้อหาเขต/วัฒนธรรม/ราคา/ชื่อ ต้องมี `docs/research/*.md` ≥2 แหล่ง (มีแหล่งทางการ/วิชาการอย่างน้อย 1) + ระบุส่วนที่แต่งเพิ่ม
 - **Narrative consistency**: event พ่อแม่/ลูก/คู่รัก/งาน ต้องมี `cond` ตรวจสถานะจริง
 - **State ใหม่**: เพิ่มใน type ที่ `src/core/state.ts` + default ใน `loadGame()`
-- **Pixel art**: tile 16px, `W2A = TILE/ART`, ห้ามวาด text ในโลกเกม (ป้ายชื่อเป็น DOM), ห้าม fractional art px
+- **Pixel art**: มาตรฐานใหม่ **32px/tile** (`ART`) — ปัจจุบันยัง 16px ระหว่างย้ายเป็นเฟส (ดู `docs/rules/art.md`) · `W2A = TILE/ART` · ห้าม text ในโลกเกม · ห้าม fractional art px
 - **โซน object**: ต้นไม้เฉพาะ grass/park, รถเข็นห้ามบนถนน, อาคารห้ามทับถนน/ทางเท้า/กันเอง
 - **ห้าม refactor ใหญ่โดยไม่จำเป็น** — แก้แบบ surgical, คงรูปแบบ function declaration/comment ไทย
 
@@ -89,10 +94,10 @@
 ## 5) Acceptance criteria ก่อนส่งงาน
 
 ```bash
-npx tsc --noEmit
-npm run build
-npm run dev   # http://127.0.0.1:5173
+npm run check     # typecheck → unit → build → e2e (4 ขนาดจอ)
 ```
++ ตรวจภาพจริง: `test-results/screens/` (menu, creation, city day/night, office, home night, บางขุนเทียน day/night, bills, ทุกแผนที่จังหวัด)
++ console ต้องไม่มี error และ audit ทั้ง 7 ตัว = `[]`
 
 ในเกม (console):
 ```js
@@ -104,8 +109,6 @@ __ol.invariantAudit()      // []
 __ol.geoAudit()            // []
 __ol.appearanceAudit()     // []
 ```
-+ ตรวจภาพจริง: แผนที่ day/night, มุมมองถนน, ออฟฟิศ, บ้าน, ภายในร้าน, วัยเด็ก
-+ console ต้องไม่มี error
 
 Debug hooks ที่มี: `__ol.tp(x,y)`, `__ol.tick(dt)`, `__ol.doAction()`, `__ol.mapSpec()`, `__ol.npcs()`, `?new=1`, `?adult=1`, `?scene=office`, `?province=&khet=`, `?notour=1`
 

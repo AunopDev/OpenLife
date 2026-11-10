@@ -85,8 +85,20 @@ export function fixedPerMonth(): number {
   return familyCost() + assetUpkeep();
 }
 
+/** ค่าครองชีพตามรายได้ (progressive lifestyle) — ตัวเลขเกม ไม่ใช่อัตราภาษีจริง
+ *  ≤40k 12% · 40–80k 18% · 80–150k 25% · >150k 30% ของรายได้รวม (เงินเดือน + รายได้พาสซีฟ)
+ *  เหตุผล: คนรายได้สูงมักมีค่าครองชีพสูงตาม (บ้าน/รถ/สังคม) — ลดการสะสมเงินส่วนเกินปลายเกม */
 export function lifestyleCost(): number {
-  return Math.round(finance.salary * 0.12);
+  const income = Math.max(0, finance.salary) + passiveIncomePerMonth();
+  const tiers: [number, number][] = [[40000, 0.12], [80000, 0.18], [150000, 0.25], [Infinity, 0.30]];
+  let prev = 0;
+  let cost = 0;
+  tiers.forEach(function (t) {
+    const part = Math.max(0, Math.min(income, t[0]) - prev);
+    cost += part * t[1];
+    prev = t[0];
+  });
+  return Math.round(cost);
 }
 
 export function billsTotalPerTurn(): number {

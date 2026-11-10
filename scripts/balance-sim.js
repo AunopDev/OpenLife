@@ -52,6 +52,8 @@ window.__sim = function (step, cap) {
   W.life.flags.autoBills = true;
   var turns = 0;
   var acts = 0;
+  var maxSalary = 0;
+  var samples = [];
   var maxTurns = cap || Math.ceil((90 - 22) * 12 / step) + 3;
   var pool = ['work', 'gym', 'tv', 'chat', 'checkup', 'gym', 'gym', 'drink', 'checkup'];
   while (W.life.phase === 'adult' && turns < maxTurns) {
@@ -66,6 +68,16 @@ window.__sim = function (step, cap) {
     W.endTurn();
     settle();
     turns++;
+    maxSalary = Math.max(maxSalary, W.finance.salary || 0);
+    if (turns % 8 === 0) {
+      samples.push({
+        turn: turns,
+        age: Math.floor(W.life.ageMonths / 12),
+        money: Math.round(W.stats.money),
+        salary: W.finance.salary,
+        debt: Math.round(Object.keys(W.debts).reduce(function (s, k) { return s + (W.debts[k].balance || 0); }, 0))
+      });
+    }
   }
   var log = W.life.log || [];
   var uniq = {};
@@ -94,6 +106,8 @@ window.__sim = function (step, cap) {
     car: !!W.life.flags.car,
     events: log.length,
     uniq: Object.keys(uniq).length,
+    maxSalary: maxSalary,
+    samples: samples,
     phase: W.life.phase,
     ending: (document.querySelector('.ev-title') || {}).textContent || ''
   };
