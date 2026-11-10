@@ -1,14 +1,16 @@
 /* assets — ผูกหน้าทรัพย์สิน: เปิด modal → รับคลิก → เรียก service → toast/save/HUD
    ไม่มีสูตรคำนวณที่นี่ (อยู่ใน assets.service.ts) */
 import {
-  buildAssetsViewModel, buyHome, buyCar, buyRental, invest, withdraw, donate, takeTrip
+  buildAssetsViewModel, buildHomeUpgradeViewModel, buyHome, buyCar, buyRental, invest, withdraw, donate, takeTrip
 } from './assets.service';
-import { renderAssetsHtml } from './assets.view';
+import { renderAssetsHtml, renderHomeUpgradeHtml } from './assets.view';
 import type { ActionResult, AssetsDeps } from './assets.types';
 
 export interface AssetsFeature {
   /** เปิดหน้าทรัพย์สิน (ไม่ทำอะไรถ้าเกมหยุดอยู่) */
   open(): void;
+  /** เปิดหน้าปรับปรุงบ้านแบบเฉพาะจุด */
+  openHome(): void;
 }
 
 export function createAssets(deps: AssetsDeps): AssetsFeature {
@@ -23,12 +25,12 @@ export function createAssets(deps: AssetsDeps): AssetsFeature {
     if (m2) m2.scrollTop = keepScroll;
   }
 
-  function finish(r: ActionResult): void {
+  function finish(r: ActionResult, reopen?: () => void): void {
     if (!r.ok) { deps.toast(r.message); return; }
     (r.achievements || []).forEach(function (a) { deps.addAchievement(a.id, a.label); });
     deps.saveGame();
     deps.updateHud();
-    refresh();
+    (reopen || refresh)();
     deps.toast(r.message);
   }
 
@@ -80,5 +82,12 @@ export function createAssets(deps: AssetsDeps): AssetsFeature {
     });
   }
 
-  return { open: open };
+  function openHome(): void {
+    if (deps.isPaused()) return;
+    deps.openModal(renderHomeUpgradeHtml(buildHomeUpgradeViewModel()));
+    on('homeClose', deps.closeModal);
+    on('homeUp', function () { finish(buyHome(), openHome); });
+  }
+
+  return { open: open, openHome: openHome };
 }

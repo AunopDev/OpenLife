@@ -1,7 +1,20 @@
 /* assets — HTML ของหน้าทรัพย์สิน (ไม่มีตรรกะเกม) */
 import { fmt } from '../../core/util';
 import { HOME_MAX, CAR_MAX, RENTAL_MAX, INVEST_OPTIONS, DONATE_SMALL, DONATE_BIG, HOME_UPKEEP_PER_LEVEL, CAR_UPKEEP_PER_TIER, RENTAL_UPKEEP_PER_UNIT } from './assets.constants';
-import type { AssetsViewModel } from './assets.types';
+import type { AssetsViewModel, HomeUpgradeViewModel } from './assets.types';
+
+export function renderHomeUpgradeHtml(vm: HomeUpgradeViewModel): string {
+  return (
+    '<div class="ev-head"><span class="ev-chip">บ้าน</span><span>ระดับ ' + vm.level + ' / ' + vm.maxLevel + '</span></div>' +
+    '<div class="ev-title">ปรับปรุงบ้าน</div>' +
+    '<div class="ev-text">บ้านที่อยู่สบายขึ้นช่วยให้ใจดีขึ้นทุกเดือน แต่มีค่าดูแลรายเดือน</div>' +
+    '<div class="pay-debt">ระดับปัจจุบัน <b>' + vm.level + '</b> · โบนัสใจ <b>+' + vm.level + '/เดือน</b> · ค่าดูแล <b>฿' + fmt(vm.level * vm.upkeepPerLevel) + '/เดือน</b></div>' +
+    (vm.nextCost !== null
+      ? '<button class="btn-primary" id="homeUp">อัปเกรดระดับ ' + (vm.level + 1) + ' · ฿' + fmt(vm.nextCost) + '</button>'
+      : '<div class="pay-warn">บ้านถึงระดับสูงสุดแล้ว</div>') +
+    '<button class="btn-ghost" id="homeClose">ปิด</button>'
+  );
+}
 
 export function renderAssetsHtml(vm: AssetsViewModel): string {
   const homeBtn = vm.homeCost !== null

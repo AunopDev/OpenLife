@@ -26,7 +26,7 @@ import * as LookEditor from './character/appearance-editor';
 import { stats, world, flags, profile, finance, career, debts, life, SAVE_KEY } from './core/state';
 import { P } from './render/palette';
 import { createBills, billsPaidThisTurn, settleBillsAtMonthEnd } from './features/bills';
-import { createAssets, HOME_COSTS, assetPrestige } from './features/assets';
+import { createAssets, assetPrestige } from './features/assets';
 import { createBusiness } from './features/business';
 import { createJobSearch } from './features/job-search';
 import { ageYears, periodMonths, currentTurnKey } from './sim/time';
@@ -3407,38 +3407,7 @@ const businessFeature = createBusiness({
 
 function openBusiness() { businessFeature.open(); }
 
-function openHomeUpgrade() {
-  if (paused) return;
-  const costs = HOME_COSTS;
-  const next = life.homeLevel || 0;
-  const html =
-    '<div class="ev-head"><span class="ev-chip">บ้าน</span><span>ระดับ ' + next + ' / 3</span></div>' +
-    '<div class="ev-title">ปรับปรุงบ้าน</div>' +
-    '<div class="ev-text">บ้านที่อยู่สบายขึ้นช่วยให้ใจดีขึ้นทุกเดือน แต่มีค่าดูแลรายเดือน</div>' +
-    '<div class="pay-debt">ระดับปัจจุบัน <b>' + next + '</b> · โบนัสใจ <b>+' + next + '/เดือน</b> · ค่าดูแล <b>฿' + fmt((next || 0) * 1500) + '/เดือน</b></div>' +
-    (next < 3
-      ? '<button class="btn-primary" id="homeUp">อัปเกรดระดับ ' + (next + 1) + ' · ฿' + fmt(costs[next]) + '</button>'
-      : '<div class="pay-warn">บ้านถึงระดับสูงสุดแล้ว</div>') +
-    '<button class="btn-ghost" id="homeClose">ปิด</button>';
-  openModal(html);
-  document.getElementById('homeClose').addEventListener('click', closeModal);
-  const up = document.getElementById('homeUp');
-  if (up) {
-    up.addEventListener('click', function () {
-      const cost = costs[next];
-      if (stats.money < cost) { toast('เงินไม่พอปรับปรุงบ้าน ฿' + fmt(cost)); return; }
-      stats.money -= cost;
-      life.homeLevel = next + 1;
-      stats.heart = clamp(stats.heart + 8, 0, 100);
-      addAchievement('home_' + life.homeLevel, 'บ้านระดับ ' + life.homeLevel);
-      if (life.homeLevel >= 3) addAchievement('home_max', 'บ้านระดับสูงสุด');
-      saveGame();
-      closeModal();
-      updateHud();
-      toast('บ้านอัปเกรดเป็นระดับ ' + life.homeLevel + ' · ใจ +8');
-    });
-  }
-}
+function openHomeUpgrade() { assetsFeature.openHome(); }
 
 /* ทรัพย์สิน/ไลฟ์สไตล์: feature module (src/features/assets) — ดู docs/rules/architecture.md */
 const assetsFeature = createAssets({

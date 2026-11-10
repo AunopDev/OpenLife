@@ -44,7 +44,6 @@ export interface AssetsDeps {
   gainSkill(key: string, amount: number): void;
 }
 
-/** ข้อมูลที่คำนวณแล้วสำหรับ view */
 export interface AssetsViewModel {
   money: number;
   prestige: number;
@@ -66,4 +65,12 @@ export interface AssetsViewModel {
   businessLevel: number;
   businessMonthly: number;
   tripsList: AssetTrip[];
+}
+
+/** ข้อมูลหน้า "ปรับปรุงบ้าน" (modal เฉพาะจุด) */
+export interface HomeUpgradeViewModel {
+  level: number;
+  maxLevel: number;
+  nextCost: number | null;
+  upkeepPerLevel: number;
 }

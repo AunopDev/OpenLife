@@ -2,9 +2,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { life, stats, debts } from '../../core/state';
 import {
-  assetPrestige, tripMultiplier, buyHome, buyCar, buyRental, invest, withdraw, donate, takeTrip, buildAssetsViewModel
+  assetPrestige, tripMultiplier, buyHome, buyCar, buyRental, invest, withdraw, donate, takeTrip,
+  buildAssetsViewModel, buildHomeUpgradeViewModel
 } from './assets.service';
-import { HOME_COSTS, CAR_TIERS, RENTAL_COSTS } from './assets.constants';
+import { HOME_COSTS, CAR_TIERS, RENTAL_COSTS, HOME_MAX } from './assets.constants';
 
 function reset() {
   stats.money = 100000000;
@@ -116,5 +117,20 @@ describe('prestige', () => {
     life.assets!.rentals = 2;
     life.assets!.trips = 3;
     expect(assetPrestige()).toBe(2 * 2 + 1 * 3 + 2 * 4 + 3);
+  });
+});
+
+describe('home upgrade view model', function () {
+  it('ระดับถัดไปและราคาตรงกับ constants', function () {
+    life.homeLevel = 0;
+    const vm = buildHomeUpgradeViewModel();
+    expect(vm.level).toBe(0);
+    expect(vm.maxLevel).toBe(HOME_MAX);
+    expect(vm.nextCost).toBe(HOME_COSTS[0]);
+  });
+  it('ถึงระดับสูงสุด → nextCost เป็น null', function () {
+    life.homeLevel = HOME_MAX;
+    const vm = buildHomeUpgradeViewModel();
+    expect(vm.nextCost).toBeNull();
   });
 });

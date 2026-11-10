@@ -5,9 +5,9 @@ import { clamp, fmt } from '../../core/util';
 import { rentalIncome } from '../../sim/economy';
 import {
   HOME_COSTS, CAR_TIERS, ASSET_TRIPS, RENTAL_COSTS, HOME_MAX, CAR_MAX, RENTAL_MAX,
-  INVEST_OPTIONS, INVEST_1M, DONATE_SMALL, DONATE_BIG, HOME_HEART, CAR_HEART
+  INVEST_OPTIONS, INVEST_1M, DONATE_SMALL, DONATE_BIG, HOME_HEART, CAR_HEART, HOME_UPKEEP_PER_LEVEL
 } from './assets.constants';
-import type { ActionResult, AssetsEffects, AssetsViewModel, AssetTrip } from './assets.types';
+import type { ActionResult, AssetsEffects, AssetsViewModel, AssetTrip, HomeUpgradeViewModel } from './assets.types';
 
 function assets() {
   if (!life.assets) life.assets = { carTier: 0, trips: 0, donated: 0, invest: 0, rentals: 0 };
@@ -142,8 +142,6 @@ export function takeTrip(index: number, effects: AssetsEffects): ActionResult {
   return { ok: true, message: trip.name + ' · ใจ +' + heart, achievements: achievements };
 }
 
-/* ---------- ข้อมูลสำหรับ view ---------- */
-
 export function buildAssetsViewModel(): AssetsViewModel {
   const a = assets();
   const b = business();
@@ -171,5 +169,16 @@ export function buildAssetsViewModel(): AssetsViewModel {
     businessLevel: b.level || 0,
     businessMonthly: b.monthly || 0,
     tripsList: ASSET_TRIPS
+  };
+}
+
+/** ข้อมูลหน้า "ปรับปรุงบ้าน" */
+export function buildHomeUpgradeViewModel(): HomeUpgradeViewModel {
+  const home = life.homeLevel || 0;
+  return {
+    level: home,
+    maxLevel: HOME_MAX,
+    nextCost: home < HOME_MAX ? HOME_COSTS[home] : null,
+    upkeepPerLevel: HOME_UPKEEP_PER_LEVEL
   };
 }
