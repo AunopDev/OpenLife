@@ -35,6 +35,7 @@ import { childAgeYears, familyTick } from './sim/family';
 import { buildCityMapArt } from './render/city-map-art';
 import { ArtScale, artToWorld, screenToArt } from './render/scale';
 import { drawHuman32, drawAnimal32, HumanLook } from './render/character-art';
+import { drawCar32, CAR_LEN } from './render/vehicle-art';
 
 ﻿'use strict';
 
@@ -6442,8 +6443,6 @@ function drawCityDynamic(flat) {
   if (!flat) drawWindowGlow();
   drawLampGlow();
   drawYaowaratDynamic(flat);
-  cars.forEach(drawCarArt);
-  peds.forEach(drawPedArt);
 }
 
 function drawPondRipples() {
@@ -6728,8 +6727,43 @@ function npcLook32(n): HumanLook {
   };
 }
 
-function drawNpcs32() {
-  npcs.forEach(function (n) {
+function drawCars32() {
+  cars.forEach(function (c) {
+    const cx = c.axis === 'h' ? c.x / W2A_OUT + CAR_LEN / 2 : c.x / W2A_OUT;
+    const cy = c.axis === 'h' ? c.y / W2A_OUT : c.y / W2A_OUT + CAR_LEN / 2;
+    drawCar32(ctx, Math.round(cx), Math.round(cy), {
+      color: c.color,
+      axis: c.axis,
+      dir: c.dir > 0 ? 1 : -1
+    });
+  });
+}
+
+function pedLook32(p): HumanLook {
+  return {
+    skin: '#f0c9a0',
+    skinDark: '#d9a97c',
+    hair: '#161a2e',
+    hairDark: '#0e1120',
+    clothes: p.color,
+    clothesShade: p.color,
+    clothesDark: '#20263f',
+    eye: '#12142a',
+    pants: '#2b3350'
+  };
+}
+
+function drawPeds32() {
+  peds.forEach(function (p) {
+    drawHuman32(ctx, Math.round(p.x / W2A_OUT), Math.round(p.y / W2A_OUT), pedLook32(p), {
+      dir: p.dir > 0 ? 'right' : 'left',
+      moving: true,
+      phase: p.phase
+    });
+  });
+}
+
+function drawNpcs32() {  npcs.forEach(function (n) {
     const x = Math.round(n.x / W2A_OUT);
     const y = Math.round(n.y / W2A_OUT);
     if (n.type.kind === 'human') {
@@ -8400,6 +8434,7 @@ function render() {
   if (!mapViewNow) {
     ctx.save();
     ctx.translate(-camAx * OUT_SCALE, -camAy * OUT_SCALE);
+    if (scene === 'city') { drawCars32(); drawPeds32(); }
     if (scene === 'district') drawNpcs32();
     drawPlayerArt32();
     ctx.restore();
