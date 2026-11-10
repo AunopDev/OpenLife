@@ -33,7 +33,7 @@ import { ageYears, periodMonths, currentTurnKey } from './sim/time';
 import { RENTAL_INCOME, totalDebt, debtMinPerMonth, costInflation, housingCost, transportCost, familyCost, assetUpkeep, rentalIncome, livingCost, taxPerMonth, socialSecurityPerMonth, fixedPerMonth, lifestyleCost, billsTotalPerTurn, passiveIncomePerMonth } from './sim/economy';
 import { childAgeYears, familyTick } from './sim/family';
 import { buildCityMapArt } from './render/city-map-art';
-import { ArtScale, artToWorld, screenToArt, viewportArt } from './render/scale';
+import { ArtScale, artToWorld, screenToArt } from './render/scale';
 
 ﻿'use strict';
 
@@ -47,17 +47,23 @@ const TILE = 64;
 let VW = 1440;
 let VH = 900;
 
-const ART = 16;              // art pixels per tile
+const ART = 16;              // art pixels per tile (สเกลเลกาซีที่โค้ดวาดภาพใช้)
 const W2A = TILE / ART;      // world px per art px (= 4)
-const STREET_PIX = 5;        // screen px per art px — street view (default)
-const INTERIOR_PIX = 4;      // interiors keep the wider view (default)
-const MAP_PIX = 2;           // screen px per art px — city map view (default)
-let PIX = STREET_PIX;
+/** สเกลเอาต์พุต: 16px art → 32px art (Phase 1 ของการย้ายเป็น 32px/tile)
+ *  วาดเลกาซีที่ 16 แล้วขยาย ×2 แบบ nearest — เกม/เซฟ/พิกัด world ไม่เปลี่ยน */
+const OUT_SCALE = 2;
+const STREET_PIX = 3;        // screen px per OUTPUT art px — street view (default)
+const INTERIOR_PIX = 2;      // interiors (default)
+const MAP_PIX = 1;           // city map view (default)
+let PIX = STREET_PIX;        // screen px per output art px (32)
+let PIX16 = PIX * OUT_SCALE; // screen px per legacy art px (16)
 let zoomLevel = MAP_PIX;
 let streetZoom = STREET_PIX;
 let interiorZoom = INTERIOR_PIX;
-let AW = VW / PIX;           // art-pixel viewport width
-let AH = VH / PIX;           // art-pixel viewport height
+let AW = VW / PIX16;         // legacy art viewport width (ใช้กับกล้อง/พิกัดเดิม)
+let AH = VH / PIX16;         // legacy art viewport height
+let AW32 = Math.ceil(VW / PIX);  // output art viewport width
+let AH32 = Math.ceil(VH / PIX);  // output art viewport height
 
 const cv = document.getElementById('game');
 const mainCtx = cv.getContext('2d');
@@ -70,15 +76,27 @@ const bctx = buffer.getContext('2d');
 bctx.imageSmoothingEnabled = false;
 let ctx = bctx;
 
+/* บัฟเฟอร์เอาต์พุต 32px art (Phase 1) — ขยายจากบัฟเฟอร์เลกาซี ×2 แบบ nearest */
+const buffer32 = document.createElement('canvas');
+buffer32.width = AW32;
+buffer32.height = AH32;
+const b32ctx = buffer32.getContext('2d');
+b32ctx.imageSmoothingEnabled = false;
+
 function setPixelScale(p, force?: boolean) {
   if (!force && Math.abs(p - PIX) < 0.001) return;
   PIX = p;
-  const vp = viewportArt(VW, VH, artScale());
-  AW = vp.w;
-  AH = vp.h;
+  PIX16 = p * OUT_SCALE;
+  AW = Math.ceil(VW / PIX16);
+  AH = Math.ceil(VH / PIX16);
+  AW32 = AW * OUT_SCALE;
+  AH32 = AH * OUT_SCALE;
   buffer.width = AW;
   buffer.height = AH;
+  buffer32.width = AW32;
+  buffer32.height = AH32;
   bctx.imageSmoothingEnabled = false;
+  b32ctx.imageSmoothingEnabled = false;
 }
 
 /* ---------- responsive layout flags ---------- */
@@ -318,21 +336,21 @@ function currentPixelScale() {
 function adjustZoom(delta) {
   if (paused) return;
   if (scene === 'city' && viewMode === 'map') {
-    zoomLevel = clamp(Math.round((zoomLevel + delta) * 4) / 4, MAP_PIX, 4.5);
+    zoomLevel = clamp(Math.round((zoomLevel + delta) * 4) / 4, MAP_PIX, 2.5);
   } else if (scene === 'city' || scene === 'district') {
-    streetZoom = clamp(Math.round((streetZoom + delta) * 2) / 2, 3, 8);
+    streetZoom = clamp(Math.round((streetZoom + delta) * 2) / 2, 2, 4);
   } else {
-    interiorZoom = clamp(Math.round((interiorZoom + delta) * 2) / 2, 3, 7);
+    interiorZoom = clamp(Math.round((interiorZoom + delta) * 2) / 2, 1, 3);
   }
 }
 
 function setZoomFromPinch(value) {
   if (scene === 'city' && viewMode === 'map') {
-    zoomLevel = clamp(Math.round(value * 4) / 4, MAP_PIX, 4.5);
+    zoomLevel = clamp(Math.round(value * 4) / 4, MAP_PIX, 2.5);
   } else if (scene === 'city' || scene === 'district') {
-    streetZoom = clamp(Math.round(value * 2) / 2, 3, 8);
+    streetZoom = clamp(Math.round(value * 2) / 2, 2, 4);
   } else {
-    interiorZoom = clamp(Math.round(value * 2) / 2, 3, 7);
+    interiorZoom = clamp(Math.round(value * 2) / 2, 1, 3);
   }
 }
 
@@ -686,7 +704,7 @@ function buildingHotspotAtWorld(wx, wy) {
 }
 
 function artScale(): ArtScale {
-  return { tilePx: TILE, artPx: ART, screenPx: PIX };
+  return { tilePx: TILE, artPx: ART, screenPx: PIX16 };
 }
 
 function screenToWorld(clientX, clientY) {
@@ -6828,8 +6846,8 @@ function layoutMapLabels(show) {
   MAP_LABELS.forEach(function (l, i) {
     const el = mapLabelEls[i];
     if (!el) return;
-    const lx = (l.x * ART - offX) * PIX;
-    const ly = (l.y * ART - offY) * PIX;
+    const lx = (l.x * ART - offX) * PIX16;
+    const ly = (l.y * ART - offY) * PIX16;
     el.style.left = (lx / VW * 100) + '%';
     el.style.top = (ly / VH * 100) + '%';
   });
@@ -6907,15 +6925,15 @@ function layoutHotspotLabels() {
   hotspotLabelEls.forEach(function (item) {
     const hx = Math.round(item.h.x / W2A);
     const hy = Math.round(item.h.y / W2A);
-    const sx = (hx - camAx) * PIX;
-    const sy = (hy - camAy) * PIX;
+    const sx = (hx - camAx) * PIX16;
+    const sy = (hy - camAy) * PIX16;
     if (sx < -70 || sx > VW + 70 || sy < -50 || sy > VH + 60) {
       item.el.style.display = 'none';
       return;
     }
     item.el.style.display = '';
     item.el.style.left = (sx / VW * 100) + '%';
-    item.el.style.top = ((sy - 9 * PIX) / VH * 100) + '%';
+    item.el.style.top = ((sy - 9 * PIX16) / VH * 100) + '%';
     const dist = Math.hypot(player.x - item.h.x, player.y - item.h.y);
     item.el.classList.toggle('near', dist < 190);
   });
@@ -8422,10 +8440,17 @@ function render() {
 
   drawLighting();
 
+  // ขยายเลกาซี 16px → 32px art (nearest) แล้ววาดขึ้นจอ
+  ctx = b32ctx;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, AW32, AH32);
+  ctx.drawImage(buffer, 0, 0, AW, AH, 0, 0, AW32, AH32);
+
   ctx = mainCtx;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(buffer, 0, 0, AW, AH, 0, 0, VW, VH);
+  ctx.drawImage(buffer32, 0, 0, AW32, AH32, 0, 0, VW, VH);
 
   drawMini();
   layoutMapLabels(mapView);
