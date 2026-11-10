@@ -69,6 +69,7 @@ OpenLife/
     district-maps.ts       # mapSpec ของแผนที่เฉพาะเขต + districtZone
     city-maps.ts           # generator แผนที่เมืองต่อจังหวัด/เขต (seeded, ไม่ใช้ผังกลาง)
     audit.ts               # data/narrative/invariant audits
+    state.ts               # state กลาง + types (stats/world/flags/profile/finance/career/debts/life)
     save.ts                # save/load v3
     actions.ts             # scene entry + daily activities + work
     menu.ts                # หน้าเมนูหลัก + พื้นหลัง pixel parallax เคลื่อนไหว
@@ -283,6 +284,7 @@ OpenLife/
 - ข้อมูลเกมหลักเป็น JSON (`src/data/`); event ยังเป็น TS เพราะมี `cond()/apply()`
 - คงรูปแบบเดิม: function declaration, `const`/`let`, comment ภาษาไทย
 - อย่า refactor ใหญ่โดยไม่จำเป็น — แก้แบบ surgical
+- เพิ่ม field ใหม่ของ state ต้องเพิ่มใน type ที่ `src/state.ts` ด้วย (และค่า default ใน `loadGame()` ถ้าเซฟเก่าไม่มี)
 - UI/ข้อความผู้เล่นเป็นภาษาไทย
 - เก็บ logic การเดิน/collision/hotspot เดิมไว้ เว้นแต่ถูกขอให้เปลี่ยน
 - ทุกครั้งที่เปลี่ยน mechanic ต้องอัปเดต `docs/GDD.md`

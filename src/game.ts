@@ -4,8 +4,6 @@ import backgroundsData from './data/backgrounds.json';
 import dreamsData from './data/dreams.json';
 import provincesData from './data/provinces.json';
 import careerData from './data/career.json';
-import financeSeed from './data/finance.json';
-import debtsSeed from './data/debts.json';
 import eventsData from './data/events.json';
 import { playSfx, unlockAudio, isSoundEnabled, initSoundButton, setPageVisible } from './audio';
 import { buildJsonEvents, runOps } from './events';
@@ -24,6 +22,7 @@ import { getCityMap } from './city-maps';
 import { geoDistricts, geoDistrict, geoNeighborhood, geoFinance, geoAudit, geoFindByZone } from './geo';
 import * as Look from './appearance';
 import * as LookEditor from './appearance-editor';
+import { stats, world, flags, profile, finance, career, debts, life, SAVE_KEY } from './state';
 
 ﻿'use strict';
 
@@ -170,107 +169,20 @@ let shopStaticKind = '';
 let shopReturn = { x: 0, y: 0 };
 
 /* ==========================================================
-   STATE
+   STATE — stats/world/flags/profile/finance/career/debts/life อยู่ใน src/state.ts
    ========================================================== */
 
-const stats = {
-  health: 82,
-  heart: 41,
-  energy: 62,
-  money: 4500,
-  kpi: 54,
-  credit: 65,
-  smarts: 55,
-  social: 50
-};
-
-const world = {
-  minutes: 7 * 60 + 30,
-  day: 0,
-  speed: 4.8 // game minutes per real second
-};
-
-const flags = {
-  workedToday: false,
-  otEvent: false,
-  usedBus: false
-};
-
-/* ---------- career / economy (vertical slice: อายุ 22, บทสร้างตัว) ---------- */
-
-const profile = {
-  name: 'สมชาย ใจดี',
-  age: 22,
-  chapter: 'สร้างตัว',
-  job: 'พนักงานเงินเดือน · เด็กใหม่'
-};
-
-const finance = Object.assign({}, financeSeed);
-
 const CAREER_RANKS = careerData;
-
-const career = {
-  rank: 0,
-  yearsInRank: 0,
-  lastReviewAge: 264,
-  reviews: 0,
-  promotions: 0,
-  bonusTotal: 0
-};
-
-// หนี้ 3 ก้อน (ต้นแบบ M1) — ผู้เล่นต้องจ่ายเอง ไม่หักเงินเดือนอัตโนมัติ
-const debts = JSON.parse(JSON.stringify(debtsSeed));
 
 let monthsPlayed = 0;
 let pendingEnding = null;
 let gameOver = false;
-const SAVE_KEY = 'openlife.save.v3';
 
 /* ==========================================================
    FULL LIFE · chapters, creation, event pools
    ========================================================== */
 
 const CHAPTERS = chaptersData;
-
-const life = {
-  phase: 'creation',   // creation | early | adult | ended
-  chapter: 1,
-  turn: 0,
-  ageMonths: 0,
-  backgroundId: null,
-  dreamId: null,
-  gender: 'ชาย',
-  province: 'กรุงเทพฯ',
-  homeProvince: 'กรุงเทพฯ',
-  district: 'bangrak',
-  traits: [],
-  rel: { family: 70, friend: 50, love: 0, boss: 50 },
-  flags: {},
-  log: [],
-  eventIndex: {},
-  lastEventTitle: '',
-  child: { name: 'ลูก', ageMonths: -1, relation: 70 },
-  parents: { health: 75, alive: true },
-  actionsThisTurn: 0,
-  careerTrack: 'corporate',
-  recentEvents: [],
-  brokeTurns: 0,
-  milestones: [],
-  needs: { fun: 70, social: 65, rest: 70, hygiene: 75, hunger: 75 },
-  mood: 'ปกติ',
-  skills: { communication: 20, tech: 15, finance: 15, fitness: 20, cooking: 20, creativity: 15 },
-  people: [],
-  business: { active: false, type: '', level: 0, monthly: 0, invested: 0 },
-  assets: { carTier: 0, trips: 0, donated: 0, invest: 0, rentals: 0 },
-  collections: { books: 0, food: 0, music: 0, stamps: 0 },
-  homeLevel: 0,
-  weather: 'แดดดี',
-  achievements: [],
-  legacy: 0,
-  plannedMonths: 1,
-  periodMonths: 1,
-  activityUses: {}
-};
 
 const BACKGROUNDS = backgroundsData;
 

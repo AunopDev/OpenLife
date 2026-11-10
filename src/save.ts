@@ -1,15 +1,17 @@
 /* OpenLife — save/load (v3) */
+import type { Stats, World, DayFlags, Profile, Finance, Debts, Career, Life } from './state';
+
 export interface SaveContext {
   saveKey: string;
-  stats: any;
-  world: any;
-  flags: any;
-  profile: any;
-  finance: any;
-  debts: any;
-  career: any;
-  life: any;
-  player: any;
+  stats: Stats;
+  world: World;
+  flags: DayFlags;
+  profile: Profile;
+  finance: Finance;
+  debts: Debts;
+  career: Career;
+  life: Life;
+  player: { x: number; y: number; dir: string };
   scene: string;
   viewMode: string;
   getMonthsPlayed: () => number;
